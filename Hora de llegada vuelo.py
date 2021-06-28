@@ -9,9 +9,7 @@ def calcular_horario_llegada(hora_salida: int, minuto_salida: int, segundo_salid
       duracion_minutos (int): Número de minutos (adicionales al número de horas) que dura el vuelo
       duracion_segundos (int): Número de segundos (adicionales al número de horas y minutos) que dura el
                                vuelo
-    Retorno:
-      str: Cadena que indica la hora de llegada del vuelo a su destino, la cadena debe estar con el formato
-           “HH:mm:ss”.
+    
     """
     hora_llegada = hora_salida + duracion_horas
     minuto_llegada = minuto_salida + duracion_minutos
