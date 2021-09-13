@@ -13,7 +13,7 @@ from matplotlib import pyplot as plt
 'Variables para la solución del problema'
 
 y1,y2 = symbols('y1 y2')
-'''
+
 '-----------------------------------------------------------------------------'
 'Datos de entrada'
 
@@ -23,13 +23,6 @@ Q = float(input("Caudal: "))
 v1 = float(input("Velocidad inicial del agua: "))
 z1 = float(input("Altura inicial del fondo del canal: "))
 z2 = float(input("Altura final del fondo del canal: "))
-'''
-Figura = 'Triangular'
-
-Q = 55#float(input("Altura inicial del agua: "))
-v1 = 1.25#float(input("Velocidad inicial del agua: "))
-z1 = 0.2#float(input("Altura inicial del fondo del canal: "))
-z2 = 0#float(input("Altura final del fondo del canal: "))
 
 'Variables por default necesarias para las funciones'
 inc= 1
@@ -76,6 +69,12 @@ if Figura == "Trapecial":
 'Funciones para el desarrollo del Ejemplo'
 
 def calculo_dz():
+    
+    """ Esta función retorna el valor de deltaz\n
+    
+    Retorna:
+        float: La diferencia de alturas del fondo del canal[m]
+    """
     
     return abs(z1-z2)
     
@@ -153,62 +152,6 @@ def calculo_y1(y1):
                 
                 return round(y1[1],2)
     return "Error en y1"
-
-print(calculo_y1(y1))
-
-
-def Area(y,inc,m1,m2):
-    
-    """ Esta función retorna el área transversal según la figura\n
-        
-    Parámetros:
-        y (float) altura del agua
-        inc (float) grados o inclinación de la sección triangular
-        m1 (float) grados o inclinación parte izquierda de un trapecio
-        m2 (float) grados o inclinación parte derecha de un trapecio
-    Retorna:
-        float: El área de la sección transversal [m^2]
-    """
-    
-    if Figura == "Rectangular":
-        
-        A = b * y
-        
-    if Figura == "Triangular":
-        
-        if incT == "alpha" or incT == "Alpha":
-            
-            A = y**2/np.tan(inc*np.pi/180)
-            
-        else:
-            
-            A = y**2 * inc
-            
-    if Figura == "Trapecial":
-        
-        
-        if incTraT == "alpha" or incTraT == "Alpha":
-            
-            if m1 == m2:
-                
-                A = y*b+y**2/np.tan(np.pi/180*m1)
-                
-            else:
-                
-                A = y**2/(2*np.tan(np.pi/180*m1)) + b*y + y**2/(2*np.tan(np.pi/180*m2))  
-        else:
-            
-            if m1 == m2:
-                
-                A = (b+m1*y)*y
-                
-            else:
-                
-                A = m1*y**2/2+b*y+m2*y**2/2 
-            
-    return A
-
-
 
 def Qfun(y,inc,m1,m2):
     
