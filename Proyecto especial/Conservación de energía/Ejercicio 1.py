@@ -4,27 +4,197 @@ Created on Sat Mar  6 15:31:09 2021
 
 @author: JFGJ
 """
-
+'Importar librerias'
 import numpy as np
-from matplotlib import pyplot as plt
 import sympy as sp
 from sympy import *
-v1, v2, Q = symbols('v1 v2 Q')
 
-b = 5
-y1 = 15
-y2 = 3
-hf = 0
+'Variables para la solución del problema'
+
+v2 = symbols('v2')
+
+'------------------------------------------------------------------------------'
+'Datos de entrada'
+
+Figura = input("Tipo de figura: ")
+
+y1 = float(input("Altura inicial del agua: "))
+y2 = float(input("Altura final del agua: "))
+
+'Gravedad'
 g = 9.81
 
-Figura = 'Rectangular'
+'------------------------------------------------------------------------------'
+'Datos adicionales dependiente del tipo de figura'
 
+if Figura == "Rectangular":
+    
+    b = float(input("Base de la figura: "))
 
+if Figura == "Triangular":
+    
+    incT = input("Tipo de inclinacio (alpha o m): ")
+    
+    if incT == "alpha" or incT == "Alpha":
+        
+        inc = float(input("Inclinación en grados: "))
+    else:
+        
+        inc = float(input("Inclinación (m): "))
+        
+if Figura == "Trapecial":
+    
+    b = float(input("Base de la figura: "))
+    incTraT = input("Tipo de inclinacio (alpha o m): ")
+    
+    if incTraT == "alpha" or incTraT == "Alpha":
+    
+        m1 = float(input("Inclinación lado izquierdo en grados: "))
+        m2 = float(input("Inclinación lado derecho en grados: "))
+        
+    else:
+        
+        m1 = float(input("Inclinación (m) lado izquierdo: "))
+        m2 = float(input("Inclinación (m) lado derecho: "))
+      
+'------------------------------------------------------------------------------'
 
+def Areas():
+    
+    """Esta función retorna el área transversal de cada figura\n"""
+    
+    if Figura == "Rectangular":
+        
+        A1 = b * y1
+        A2 = b * y2
+        
+    if Figura == "Triangular":
+        
+        if incT == "alpha" or incT == "Alpha":
+            
+            A1 = y1**2/np.tan(np.pi/180*inc)
+            A2 = y2**2/np.tan(np.pi/180*inc)
+            
+        else:
+            
+            A1 = y1**2 * inc
+            A2 = y2**2 * inc
+            
+    if Figura == "Trapecial":
+        
+        
+        if incTraT == "alpha" or incTraT == "Alpha":
+            
+            if m1 == m2:
+                
+                A1 = y1*b+y1**2/np.tan(np.pi/180*m1)
+                A2 = y2*b+y2**2/np.tan(np.pi/180*m1)
+                
+            else:
+                
+                A1 = y1**2/(2*np.tan(np.pi/180*m1)) + b*y1 + y1**2/(2*np.tan(np.pi/180*m2)) 
+                A2 = y2**2/(2*np.tan(np.pi/180*m1)) + b*y2 + y2**2/(2*np.tan(np.pi/180*m2)) 
+        else:
+            
+            if m1 == m2:
+                
+                A1 = (b+m1*y1)*y1
+                A2 = (b+m1*y2)*y2
+                
+            else:
+                
+                A1 = m1*y1**2/2+b*y1+m2*y1**2/2 
+                A2 = m1*y2**2/2+b*y2+m2*y2**2/2
+            
+    return A1,A2
 
+def CaudalSalidafun(v2):
+    
+    """Esta función retorna el caudal de salida según la figura\n
+    v2 = diametro(m)<br />"""
 
+    if Figura == "Rectangular":
+        
+        v1 = y2/y1 * v2
 
+        ecu1 = Eq(y1 + ((v1)**2/(2*g)),y2 + v2**2/(2*g))
+        
+        v2 = round(solve(ecu1)[1],4)
+        
+        Q = v2 * Areas()[1]
+        
 
+    if Figura == "Triangular":
+        
+        if incT == "Alpha" or incT == "alpha":
+            
+            v1 = v2 * ((y2**2)/(np.tan(np.pi/180*inc))) * ((np.tan(np.pi/180*inc))/(y1**2))
+            
+            ecu1 = Eq(y1 + ((v1)**2/(2*g)),y2 + v2**2/(2*g))
+
+            v2 = round(solve(ecu1)[1],4)
+            
+            Q = v2 *Areas()[1]
+            
+        else:
+            
+            v1 = v2 * y2**2/y1**2
+            
+            ecu1 = Eq(y1 + ((v1)**2/(2*g)),y2 + v2**2/(2*g))
+
+            v2 = round(solve(ecu1)[1],4)
+            
+            Q = v2 * Areas()[1]
+            
+            
+    if Figura == "Trapecial":
+        
+        if incTraT == "alpha" or incTraT == "Alpha":
+            
+            if m1 == m2:
+                
+                v1 = v2 * y2*b+y2**2/np.tan(np.pi/180*m1) * 1/(y1*b+y1**2/np.tan(np.pi/180*m1))
+            
+                ecu1 = Eq(y1 + ((v1)**2/(2*g)),y2 + v2**2/(2*g))
+
+                v2 = round(solve(ecu1)[1],4)
+                
+                Q = v2 * Areas()[1]
+                
+            else:
+                
+                v1 = v2 * (y2**2/(2*np.tan(np.pi/180*m1)) + b*y2 + y2**2/(2*np.tan(np.pi/180*m2))) * (1/(y1**2/(2*np.tan(np.pi/180*m1)) + b*y1 + y1**2/(2*np.tan(np.pi/180*m2))))
+            
+                ecu1 = Eq(y1 + ((v1)**2/(2*g)),y2 + v2**2/(2*g))
+
+                v2 = round(solve(ecu1)[1],4)
+                
+                Q = v2 * Areas()[1]
+        else:
+            
+            if m1 == m2:
+                
+                v1 = v2 * ((b+m1*y2)*y2) * 1/((b+m1*y1)*y1)
+            
+                ecu1 = Eq(y1 + ((v1)**2/(2*g)),y2 + v2**2/(2*g))
+
+                v2 = round(solve(ecu1)[1],4)
+                
+                Q = v2 * Areas()[1]
+                
+            else:
+                
+                v1 = v2 * (m1*y2**2/2+b*y2+m2*y2**2/2) * 1/(m1*y1**2/2+b*y1+m2*y1**2/2)
+            
+                ecu1 = Eq(y1 + ((v1)**2/(2*g)),y2 + v2**2/(2*g))
+
+                v2 = round(solve(ecu1)[1],4)
+                
+                Q = v2 * Areas()[1]
+            
+    return round (Q,4)
+
+print(CaudalSalidafun(v2))
 
 
 
