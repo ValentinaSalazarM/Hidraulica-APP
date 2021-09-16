@@ -10,10 +10,14 @@ import sympy as sp
 from sympy import *
 from matplotlib import pyplot as plt
 
+'1/tan30 = 1.73205'
+'1/tan60 = 0.57735'
+
 'Variables para la solución del problema'
 
 y1,y2 = symbols('y1 y2')
 
+'Caída del fondo del canal'
 '-----------------------------------------------------------------------------'
 'Datos de entrada'
 
@@ -153,23 +157,6 @@ def calculo_y1(y1):
                 return round(y1[1],2)
     return "Error en y1"
 
-def Qfun(y,inc,m1,m2):
-    
-    """ Esta función retorna el caudal según la sección transversal\n
-        
-    Parámetros:
-        y (float) altura del agua
-        inc (float) grados o inclinación de la sección triangular
-        m1 (float) grados o inclinación parte izquierda de un trapecio
-        m2 (float) grados o inclinación parte derecha de un trapecio
-    Retorna:
-        float: El cuadal de la sección transversal [m^3/s]
-    """
-    
-    Q = v1 * Area(y,inc,m1,m2) 
-    
-    return Q
-
 
 def Q_en_litros(Q):
     
@@ -203,7 +190,7 @@ def y2fun(y1,y2):
     
     if Figura == "Rectangular":
         
-        ec1 = Eq(8.8+((v1**2)/(2*g))+dz,y2+((Q**2)/(2*g*(b*y2)**2)))
+        ec1 = Eq(y1+((v1**2)/(2*g))+dz,y2+((Q**2)/(2*g*(b*y2)**2)))
     
         y2 = solve(ec1)
     
@@ -211,12 +198,12 @@ def y2fun(y1,y2):
         
         if incT == "alpha" or incT == "Alpha":
             
-            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(y1,inc,m1,m2)**2)/(2*g*(y2**2/np.tan(np.pi/180*inc))**2))+z2)
+            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Q**2)/(2*g*(y2**2/np.tan(np.pi/180*inc))**2))+z2)
     
             y2 = solve(ec1)
             
         else:
-            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(y1,inc,m1,m2)**2)/(2*g*(y2**2*inc)**2))+z2)
+            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Q**2)/(2*g*(y2**2*inc)**2))+z2)
     
             y2 = solve(ec1)       
     
@@ -226,25 +213,25 @@ def y2fun(y1,y2):
             
             if m1 == m2:
                 
-                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(y1,inc,m1,m2)**2)/(2*g*(y2*b+y2**2/np.tan(np.pi/180*m1))**2))+z2)
+                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Q**2)/(2*g*(y2*b+y2**2/np.tan(np.pi/180*m1))**2))+z2)
     
                 y2 = solve(ec1)
                 
             else:
                 
-                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(y1,inc,m1,m2)**2)/(2*g*(y2**2/(2*np.tan(np.pi/180*m1)) + b*y2 + y2**2/(2*np.tan(np.pi/180*m2)))**2))+z2)
+                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Q**2)/(2*g*(y2**2/(2*np.tan(np.pi/180*m1)) + b*y2 + y2**2/(2*np.tan(np.pi/180*m2)))**2))+z2)
     
                 y2 = solve(ec1) 
         else:
             
             if m1 == m2:
                 
-                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(y1,inc,m1,m2)**2)/(2*g*((b+m1*y2)*y2)**2))+z2)
+                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Q**2)/(2*g*((b+m1*y2)*y2)**2))+z2)
     
                 y2 = solve(ec1)
                 
             else:
-                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(y1,inc,m1,m2)**2)/(2*g*(m1*y2**2/2+b*y2+m2*y2**2/2)**2))+z2)
+                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Q**2)/(2*g*(m1*y2**2/2+b*y2+m2*y2**2/2)**2))+z2)
             
                 y2 = solve(ec1)
     
@@ -257,7 +244,6 @@ def y2fun(y1,y2):
         i+=1
     
     return y 
-print(y2fun(y1,y2))
 
 
 def grafica3 ():
@@ -277,7 +263,7 @@ def grafica3 ():
     Ei = yg + (Q**2/(2*g*(Area(yg,inc,m1,m2))**2))
 
     plt.style.use('classic')
-    plt.plot(Ei,yg,label = '')
+    plt.plot(Ei,yg,label = 'S8')
     plt.plot(x,x, label = 'E = y', linestyle='dashed')
     plt.xlabel('E (m)')
     plt.ylabel('y (m)')

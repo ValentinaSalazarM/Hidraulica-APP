@@ -14,6 +14,7 @@ b, y1, v1, z1, y2, v2, z2, Q, yin, dz2, y3 = symbols('b y1 v1 z1 y2 v2 z2 Q yin 
 
 y1 = 3.8
 v1 = 1.2
+g = 9.81
 
 dz = 2.3
 
@@ -30,8 +31,6 @@ round(y2[2],4)
 y2 = y2[2]
 
 yc = ((q**2)/(g))**(1/3)
-
-
 
 Ec = 3/2*yc
 

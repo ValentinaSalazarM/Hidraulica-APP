@@ -10,10 +10,14 @@ import sympy as sp
 from sympy import *
 from matplotlib import pyplot as plt
 
+'1/tan30 = 1.73205'
+'1/tan60 = 0.57735'
+
 'Variables para la solución del problema'
 
 y2 = symbols('y2')
 
+'Elevación del fondo del canal'
 '-----------------------------------------------------------------------------'
 'Datos de entrada'
 
@@ -230,7 +234,7 @@ def grafica2 ():
     Ei = yg + (Qfun(y1,inc,m1,m2))**2/(2*g*(Area(yg,inc,m1,m2))**2)  
 
     plt.style.use('classic')
-    plt.plot(Ei,yg,label = '')
+    plt.plot(Ei,yg,label = 'S')
     plt.plot(x,x, label = 'E = y', linestyle='dashed')
     plt.xlabel('E (m)')
     plt.ylabel('y (m)')
@@ -258,11 +262,18 @@ def imprimir_valores():
         y.append(round(yf[i],3))
         i+=1
     
-    msg1 = '\nEl área transversal 1 es: '+str(round(Area(y1,inc,m1,m2),3)) +'\nEl área transversal 2 es: '+str(round(Area(y[2],inc,m1,m2),3)) 
+    msg1 = '\nEl área transversal 1 es: '+str(round(Area(y1,inc,m1,m2),3)) 
     msg2 = '\nEl cuadal [l/s] es:'+str(round(Q_en_litros(Qfun(y1,inc,m1,m2)),4)) 
     msg3 = '\nLos valores de y2 son: '+ str(y)
-    msg4 = '\nEl valor sugerido es para y2 es: '+ str(y[2])
-    temp = msg1 +msg2 +msg3 +msg4
+    if Figura == 'Trapecial':
+        msg4 = '\nLa altura final del agua (y2) es: '+str(round(max(yf),2))
+        msg6 = '\nEl área transversal 2 es: '+str(round(Area(max(yf),inc,m1,m2),3)) 
+    else:
+        msg4 = '\nLa altura final del agua (y2) es: '+str(y[2])
+        msg6 = '\nEl área transversal 2 es: '+str(round(Area(y[2],inc,m1,m2),3)) 
+    
+    msg5 = '\nEl valor sugerido es para y2 es: '+ str(y[2])
+    temp = msg1 +msg6+ msg2 +msg3 +msg4
     
     return temp
 

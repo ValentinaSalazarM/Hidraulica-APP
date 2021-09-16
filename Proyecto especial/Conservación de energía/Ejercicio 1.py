@@ -9,10 +9,14 @@ import numpy as np
 import sympy as sp
 from sympy import *
 
+'1/tan30 = 1.73205'
+'1/tan60 = 0.57735'
+
 'Variables para la solución del problema'
 
 v2 = symbols('v2')
 
+'Calculo del caudal'
 '------------------------------------------------------------------------------'
 'Datos de entrada'
 
@@ -153,7 +157,7 @@ def CaudalSalidafun(v2):
             
             if m1 == m2:
                 
-                v1 = v2 * y2*b+y2**2/np.tan(np.pi/180*m1) * 1/(y1*b+y1**2/np.tan(np.pi/180*m1))
+                v1 = v2 * (y2*b+y2**2/np.tan(np.pi/180*m1)) * 1/(y1*b+y1**2/np.tan(np.pi/180*m1))
             
                 ecu1 = Eq(y1 + ((v1)**2/(2*g)),y2 + v2**2/(2*g))
 
