@@ -14,12 +14,31 @@ import unidecode
 import scipy.integrate as integrate
 
 '-----------------------------------------------------------------------------'
+def cambioUnidades(x,u):
+    if u=='mm':
+        var=x/1000
+    elif u=='cm':
+        var=x/100
+    elif u=='in':
+        var=x*0.0254
+    else:
+        var=x
+    return var
+
+
+
+'-----------------------------------------------------------------------------'
 'Funciones que retornan geometría del canal'
 
-def  geom_c(d,ynd):
+def  geom_c(d,ynd,unidades):
     """ Esta función retorna la geometría de un canal circular\n
-    d=diametro(m)<br />
-    ynd=relación de llenado"""
+    d=diametro<br />
+    ynd=relación de llenado<br />
+    unidades = mm,cm,m,in"""
+    
+    d = cambioUnidades(d,unidades)
+
+    
     yn=ynd*d
     theta = math.pi+2*math.asin((yn-(d/2))/(d/2))
     A= (theta-math.sin(theta))*d**2/8
