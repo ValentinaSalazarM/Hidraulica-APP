@@ -245,7 +245,7 @@ def grafica2 ():
 
 def imprimir_valores():
     
-    """ Esta función retirna los valores del caudal, el área y la gráfica
+    """ Esta función retorna los valores del caudal, el área y la gráfica
     Retorna:
         plot: Gráfica de energía específica
         str: Mensaje con los valores de caudal y área
@@ -272,7 +272,6 @@ def imprimir_valores():
         msg4 = '\nLa altura final del agua (y2) es: '+str(y[2])
         msg6 = '\nEl área transversal 2 es: '+str(round(Area(y[2],inc,m1,m2),3)) 
     
-    msg5 = '\nEl valor sugerido es para y2 es: '+ str(y[2])
     temp = msg1 +msg6+ msg2 +msg3 +msg4
     
     return temp

@@ -65,7 +65,11 @@ if Figura == "Trapecial":
 
 def Areas():
     
-    """Esta función retorna el área transversal de cada figura\n"""
+    """ Esta función retorna el área transversal según la figura\n
+    
+    Retorna:
+        float: El área de la sección transversal [m^2]
+    """
     
     if Figura == "Rectangular":
         
@@ -114,8 +118,11 @@ def Areas():
 
 def CaudalSalidafun(v2):
     
-    """Esta función retorna el caudal de salida según la figura\n
-    v2 = diametro(m)<br />"""
+    """Esta función retorna el área transversal según la figura\n
+    
+    Retorna:
+        float: El caudal [m^3/s]
+    """
 
     if Figura == "Rectangular":
         
@@ -198,8 +205,22 @@ def CaudalSalidafun(v2):
             
     return round (Q,4)
 
-print(CaudalSalidafun(v2))
+def imprimir_valores():
+    
+    """ Esta función retorna los valores del caudal y las áreas de cada sección
+    Retorna:
+        str: Mensaje con los valores de caudal y áreas
+    """
+    
+    msg1 = '\nEl área transversal 1 es: '+str(round(Areas()[0],3)) 
+    msg2 = '\nEl área transversal 2 es: '+str(round(Areas()[1],3)) 
+    msg3 = '\nEl cuadal [l/s] es: '+str(round(CaudalSalidafun(v2)*1000,4)) 
+    
+    temp = msg1 + msg2 +msg3 
+    return temp
 
+
+print(imprimir_valores())
 
 
 
