@@ -9,19 +9,11 @@ import numpy as np
 import sympy as sp
 from matplotlib import pyplot as plt
 from sympy import *
-b, y1, v1, z1, y2, v2, z2, Q, yin, m, yc, Ec = symbols('b y1 v1 z1 y2 v2 z2 Q yin m yc Ec')
+yin, m, yc, Ec, y2, v2= symbols('yin m yc Ec y2 v2')
 
 'Contracción del canal'
 '-----------------------------------------------------------------------------'
-'Datos de entrada'
-'''
-Figura = input("Tipo de figura: ")
 
-y1 = float(input("Altura inicial del agua (y1): "))
-b1 = float(input("Base inicial del canal (b1): "))
-b2 = float(input("Base final del canal (b2): "))
-v1 = float(input("Velocidad inicial del agua (v1): "))
-'''
 'Variables por default necesarias para las funciones'
 
 m1 = 1
@@ -30,10 +22,10 @@ m2 = 1
 'Gravedad'
 g = 9.81
 
-Figura = 'Rectangular'
+Figura = 'Trapecial'
 y1 = 3.8
 b1 = 16
-b2 = 10
+b2 = 4
 v1 = 1.05
 
 '-----------------------------------------------------------------------------'
@@ -41,18 +33,18 @@ v1 = 1.05
 
 if Figura == "Trapecial":
     
-    incTraT = input("Tipo de inclinacio (alpha o m): ")
+    incTraT = 'alpha'
     
     if incTraT == "alpha" or incTraT == "Alpha":
         
-        m1 = float(input("Inclinación lado izquierdo en grados: "))
-        m2 = float(input("Inclinación lado derecho en grados: "))
+        m1 = 45
+        m2 = 45
         
     else:
         
-        m1 = float(input("Inclinación (m) lado izquierdo: "))
-        m2 = float(input("Inclinación (m) lado derecho: "))
-
+        m1 = 1
+        m2 = 1
+        
 def Area(y,b,m1,m2):
     
     """ Esta función retorna el área transversal según la figura\n
@@ -259,16 +251,14 @@ def calculo_Ec(Ec, yc):
     
     return Ec
 
-
-'Error'
 def calculo_yin(Ec,yin):
     
     Q = Qfun(y1,b1,m1,m2)
     Ec = calculo_Ec(Ec,yin)[0]
-    
+
     if Figura == "Rectangular":
         
-        ec1 = Eq(Ec,yin+((Q**2)/(2*g*(b2*yin)**2)))
+        ec1 = Eq(Ec,yin+((Q**2)/(2*g*(b1*yin)**2)))
     
         yin = solve(ec1)  
     
@@ -278,28 +268,38 @@ def calculo_yin(Ec,yin):
             
             if m1 == m2:
                 
-                ec1 = Eq(Ec,yin+((Q**2)/(2*g*(yin*b2+yin**2/np.tan(np.pi/180*m1))**2)))
+                ec1 = Eq(Ec,yin+((Q**2)/(2*g*(yin*b1+yin**2/np.tan(np.pi/180*m1))**2)))
     
                 yin = solve(ec1)
                 
             else:
                 
-                ec1 = Eq(Ec,yin+((Q**2)/(2*g*(yin**2/(2*np.tan(np.pi/180*m1)) + b2*yin + yin**2/(2*np.tan(np.pi/180*m2)))**2)))
+                ec1 = Eq(Ec,yin+((Q**2)/(2*g*(yin**2/(2*np.tan(np.pi/180*m1)) + b1*yin + yin**2/(2*np.tan(np.pi/180*m2)))**2)))
     
                 yin = solve(ec1) 
         else:
             
             if m1 == m2:
                 
-                ec1 = Eq(Ec,yin+((Q**2)/(2*g*((b2+m1*yin)*yin)**2)))
+                ec1 = Eq(Ec,yin+((Q**2)/(2*g*((b1+m1*yin)*yin)**2)))
     
                 yin = solve(ec1)
                 
             else:
-                ec1 = Eq(Eq,yin+((Q**2)/(2*g*(m1*yin**2/2+b2*yin+m2*yin**2/2)**2)))
+                ec1 = Eq(Eq,yin+((Q**2)/(2*g*(m1*yin**2/2+b1*yin+m2*yin**2/2)**2)))
             
                 yin = solve(ec1)
-    return yin
+    i=0
+    y =[]
+    
+    while i<len(yin):
+
+        y.append(round(re(yin[i]),3))
+            
+        i+=1
+        
+    return y
+
 
 def grafica4 (m):
 
@@ -320,7 +320,9 @@ def grafica4 (m):
     plt.plot(E,yg,label = 'S1')
     plt.plot(E2,yg,label = 'S2')
     plt.plot(x,x, label = 'E = y',linestyle='dashed')
-    plt.plot(x,m*x,label = 'Ec = 3/2 yc', linestyle='dashed')    
+    if Figura == "Rectangular":
+        plt.plot(x,m*x,label = 'Ec = 3/2 yc', linestyle='dashed')
+        
     plt.xlabel('E (m)')
     plt.ylabel('y (m)')
     plt.xlim(0,10)
@@ -331,23 +333,26 @@ def grafica4 (m):
 
 def imprimir_valores():
     
-    print('Area1 ', Area(y1,b1,m1,m2))
+    msg1 = '\nArea1 '+ str( Area(y1,b1,m1,m2))
     
-    print('Caudal ', Qfun(y1,b1,m1,m2))
+    msg2 = '\nCaudal '+ str(Qfun(y1,b1,m1,m2))
     
-    print('valores de y2 ',y2fun(y2))
+    msg3 = '\nvalores de y2 '+ str(y2fun(y2))
     
-    print('valor de yc', calculo_yc(yc))
+    msg4 = '\nvalor de yc'+ str(calculo_yc(yc))
     
-    print('valor de Ec',calculo_Ec(Ec, yc))
+    msg5 = '\nvalor de Ec'+ str(calculo_Ec(Ec, yc))
 
-    print('velocidad en 2 ',calculo_v2())   
+    msg6 = '\nvelocidad en 2 '+ str(calculo_v2())   
     
-    print(calculo_yin(Ec,yin))
+    msg7= '\nNuevo y1 '+ str( max(calculo_yin(Ec,yin)))
    
     grafica4(m)
-
+    
+    return msg1 + msg2 + msg3+ msg4+ msg5+ msg6+ msg7
+    
 print(imprimir_valores())
+
 
 
 

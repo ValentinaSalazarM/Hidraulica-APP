@@ -20,10 +20,14 @@ v2 = symbols('v2')
 '------------------------------------------------------------------------------'
 'Datos de entrada'
 
-Figura = input("Tipo de figura: ")
+Figura = 'Trapecial'
 
-y1 = float(input("Altura inicial del agua: "))
-y2 = float(input("Altura final del agua: "))
+y1 = 15
+y2 = 3
+b=5
+inc=1
+m1=1
+m2=1
 
 'Gravedad'
 g = 9.81
@@ -33,40 +37,46 @@ g = 9.81
 
 if Figura == "Rectangular":
     
-    b = float(input("Base de la figura: "))
+    b = 5
 
 if Figura == "Triangular":
     
-    incT = input("Tipo de inclinacio (alpha o m): ")
+    incT = 'alpha'
     
     if incT == "alpha" or incT == "Alpha":
         
-        inc = float(input("Inclinación en grados: "))
+        inc = 45
     else:
         
-        inc = float(input("Inclinación (m): "))
+        inc = 1
         
 if Figura == "Trapecial":
     
-    b = float(input("Base de la figura: "))
-    incTraT = input("Tipo de inclinacio (alpha o m): ")
+    b = 5
+    incTraT = 'alpha'
     
     if incTraT == "alpha" or incTraT == "Alpha":
     
-        m1 = float(input("Inclinación lado izquierdo en grados: "))
-        m2 = float(input("Inclinación lado derecho en grados: "))
+        m1 = 45
+        m2 = 45
         
     else:
         
-        m1 = float(input("Inclinación (m) lado izquierdo: "))
-        m2 = float(input("Inclinación (m) lado derecho: "))
+        m1 = 1
+        m2 = 1
       
 '------------------------------------------------------------------------------'
 
-def Areas():
+def Areas(y1,y2,b,inc,m1,m2):
     
     """ Esta función retorna el área transversal según la figura\n
-    
+    Parametros: 
+        y1 (float) altura de la sección 1 
+        y2 (float) altura de la sección 2 
+        b (float) base del canal
+        inc (int) inclinacion del triangulo
+        m1 (int) pendiente del lado izquierdo del canal 
+        m2 (int) pendiente de lado derecho del canal
     Retorna:
         float: El área de la sección transversal [m^2]
     """
@@ -116,10 +126,15 @@ def Areas():
             
     return A1,A2
 
-def CaudalSalidafun(v2):
+def CaudalSalidafun(y1,y2,v1,v2):
     
-    """Esta función retorna el área transversal según la figura\n
+    """Esta función retorna el caudal\n
     
+    Parametros:
+        y1 (float) altura de la sección 1 
+        y2 (float) altura de la sección 2 
+        v1 (float) velocidad de la sección 1
+        v2 (Symbol) velocidad de las sección dos para realizar el cálculo
     Retorna:
         float: El caudal [m^3/s]
     """
@@ -132,7 +147,7 @@ def CaudalSalidafun(v2):
         
         v2 = round(solve(ecu1)[1],4)
         
-        Q = v2 * Areas()[1]
+        Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
         
 
     if Figura == "Triangular":
@@ -145,7 +160,7 @@ def CaudalSalidafun(v2):
 
             v2 = round(solve(ecu1)[1],4)
             
-            Q = v2 *Areas()[1]
+            Q = v2 *Areas(y1,y2,b,inc,m1,m2)[1]
             
         else:
             
@@ -155,7 +170,7 @@ def CaudalSalidafun(v2):
 
             v2 = round(solve(ecu1)[1],4)
             
-            Q = v2 * Areas()[1]
+            Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
             
             
     if Figura == "Trapecial":
@@ -170,7 +185,7 @@ def CaudalSalidafun(v2):
 
                 v2 = round(solve(ecu1)[1],4)
                 
-                Q = v2 * Areas()[1]
+                Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
                 
             else:
                 
@@ -180,7 +195,7 @@ def CaudalSalidafun(v2):
 
                 v2 = round(solve(ecu1)[1],4)
                 
-                Q = v2 * Areas()[1]
+                Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
         else:
             
             if m1 == m2:
@@ -191,7 +206,7 @@ def CaudalSalidafun(v2):
 
                 v2 = round(solve(ecu1)[1],4)
                 
-                Q = v2 * Areas()[1]
+                Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
                 
             else:
                 
@@ -201,7 +216,7 @@ def CaudalSalidafun(v2):
 
                 v2 = round(solve(ecu1)[1],4)
                 
-                Q = v2 * Areas()[1]
+                Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
             
     return round (Q,4)
 
@@ -212,9 +227,9 @@ def imprimir_valores():
         str: Mensaje con los valores de caudal y áreas
     """
     
-    msg1 = '\nEl área transversal 1 es: '+str(round(Areas()[0],3)) 
-    msg2 = '\nEl área transversal 2 es: '+str(round(Areas()[1],3)) 
-    msg3 = '\nEl cuadal [l/s] es: '+str(round(CaudalSalidafun(v2)*1000,4)) 
+    msg1 = '\nEl área transversal 1 [m^2] es: '+str(round(Areas(y1,y2,b,inc,m1,m2)[0],3)) 
+    msg2 = '\nEl área transversal 2 [m^2] es: '+str(round(Areas(y1,y2,b,inc,m1,m2)[1],3)) 
+    msg3 = '\nEl cuadal [l/s] es: '+str(round(CaudalSalidafun(y1,y2,v1,v2)*1000,4)) 
     
     temp = msg1 + msg2 +msg3 
     return temp

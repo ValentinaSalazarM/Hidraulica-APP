@@ -21,12 +21,12 @@ y1,y2 = symbols('y1 y2')
 '-----------------------------------------------------------------------------'
 'Datos de entrada'
 
-Figura = input("Tipo de figura: ")
+Figura = 'Rectangular'
 
-Q = float(input("Caudal: "))
-v1 = float(input("Velocidad inicial del agua: "))
-z1 = float(input("Altura inicial del fondo del canal: "))
-z2 = float(input("Altura final del fondo del canal: "))
+Q = 56.25
+v1 = 1.25
+z1 = 0
+z2 = 1.05
 
 'Variables por default necesarias para las funciones'
 inc= 1
@@ -41,33 +41,33 @@ g = 9.81
 
 if Figura == "Rectangular":
     
-    b = float(input("Base de la figura: "))
+    b = 10
 
 if Figura == "Triangular":
     
-    incT = input("Tipo de inclinacio (alpha o m): ")
+    incT = 'alpha'
     
     if incT == "alpha" or incT == "Alpha":
         
-        inc = float(input("Inclinación en grados: "))
+        inc = 45
     else:
         
-        inc = float(input("Inclinación (m): "))
+        inc = 1
         
 if Figura == "Trapecial":
     
-    b = float(input("Base de la figura: "))
-    incTraT = input("Tipo de inclinacio (alpha o m): ")
+    b = 10
+    incTraT = 'alpha'
     
     if incTraT == "alpha" or incTraT == "Alpha":
         
-        m1 = float(input("Inclinación lado izquierdo en grados: "))
-        m2 = float(input("Inclinación lado derecho en grados: "))
+        m1 = 45
+        m2 = 45
         
     else:
         
-        m1 = float(input("Inclinación (m) lado izquierdo: "))
-        m2 = float(input("Inclinación (m) lado derecho: "))
+        m1 = 1
+        m2 = 1
 
 '-----------------------------------------------------------------------------'
 'Funciones para el desarrollo del Ejemplo'
