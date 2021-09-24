@@ -14,7 +14,12 @@ import unidecode
 import scipy.integrate as integrate
 
 '-----------------------------------------------------------------------------'
-def cambioUnidades(x,u):
+'Funciones para cambio de unidades'
+
+def CU_m(x,u):
+    """Cambia unidades de longitud ingresadas a metros \n
+    x=valor
+    u=unidades --> cm, mm, in"""
     if u=='mm':
         var=x/1000
     elif u=='cm':
@@ -25,18 +30,30 @@ def cambioUnidades(x,u):
         var=x
     return var
 
+def CU_theta(x,u):
+    """Cambia unidades de ángulo ingresado a grados \n
+    x=valor
+    u=unidades --> grados, radianes, m/m """
+    if u=='grados':
+        theta=x
+    elif u=='radianes':
+        theta=math.degrees(x)
+    else:
+        theta=math.degrees((math.atan(x)))
+        
+    return theta
 
 
 '-----------------------------------------------------------------------------'
 'Funciones que retornan geometría del canal'
 
-def  geom_c(d,ynd,unidades):
+def  geom_c(d,ynd,ud):
     """ Esta función retorna la geometría de un canal circular\n
     d=diametro<br />
     ynd=relación de llenado<br />
-    unidades = mm,cm,m,in"""
+    unidades=unidades de d (mm, cm, m, in)<br />"""
     
-    d = cambioUnidades(d,unidades)
+    d = CU_m(d,ud)
 
     
     yn=ynd*d
@@ -48,44 +65,70 @@ def  geom_c(d,ynd,unidades):
     D=A/T
     return yn,theta,A,P,Rh,T,D
 
-def geom_r(y,b,m):
+def geom_r(y,b,m1,m2,um,uy,ub):
     """ Esta función retorna la geometría de un canal geométrico no circular\n
-    y=profundidad (m)<br />
-    b=base (m)<br />
-    m=inclinación"""
-    A = b*y+m*y**2
-    P=b+2*y*math.sqrt(m**2+1)
+    y=profundidad<br />
+    b=base<br />
+    m1=inclinación lado 1<br />
+    m2 = inclinación lado 2<br />
+    um = unidades de m (grados, radianes, m/m)
+    uy=unidades de y (mm, cm, m, in)<br />
+    ub=unidades de b (mm, cm, m, in)<br />"""
+    
+    m1=CU_theta(m1,um)
+    m2=CU_theta(m2,um)
+    m1=math.tan(math.radians(m1))
+    m2=math.tan(math.radians(m2))
+    
+    y=CU_m(y,uy)
+    b=CU_m(b,ub)
+    
+    A = b*y+(m1*y**2)/2+(m2*y**2)/2
+    P=b+y*math.sqrt(m1**2+1)+y*math.sqrt(m2**2+1)
     Rh=A/P
-    T=b+2*m*y
+    T=b+m1*y+m2*y
     D=A/T
     return A,P,Rh,T,D
 
 '-----------------------------------------------------------------------------'
-def froude(y,b,m,Q,d):
+def froude(y,b,m1,m2,um,Q,d,uy,ub,ud,uQ):
     """Calcula el número de froude con las propiedades geométricas y el caudal\n
     y=profundidad (m)<br />
     b=base (m)<br />
-    m=inclinación <br />
+    m1=inclinación lado 1<br />
+    m2 = inclinación lado 2<br />
+    um = unidades de m (grados, radianes, m/m)<br />
     Q=caudal (m3/s) <br />
-    d=diámetro<br />
+    d=diámetro (m)<br />
+    u_y=unidades de y (mm, cm, m, in)<br />
+    u_b=unidades de b (mm, cm, m, in)<br />
+    u_d=unidades de d (mm, cm, m, in)<br />
+    u_Q = unidades de caudal--> L, m3 <br />
     Los parámetros que no se requieran, se dejan en 0"""
     
+    y=CU_m(y,uy)
+    b=CU_m(b,ub)
+    d=CU_m(d,ud)
+    if uQ=='L':
+        Q=Q/1000
+    
     if d==0:
-        A,P,Rh,T,D=geom_r(y,b,m)
+        A,P,Rh,T,D=geom_r(y,b,m1,m2,um,"m","m")
     else:
         ynd=y/d
-        yn,theta,A,P,Rh,T,D=geom_c(d,ynd)
+        yn,theta,A,P,Rh,T,D=geom_c(d,ynd,"m")
     
     Fr=Q/(A*math.sqrt(9.81*A/T))
     return Fr
 
 '-----------------------------------------------------------------------------'
-def ecuacion_yc_Rectangulo(Q,b,m,y):
-    ecuacion=((Q/math.sqrt(9.81))-(m*y**2+b*y)*math.sqrt(m*y**2+b*y)/(math.sqrt(2*m*y+b)))
+def ecuacion_yc_Rectangulo(Q,b,m1,m2,y):
+    ecuacion=((Q/math.sqrt(9.81))-(b*y+(m1*y**2)/2+(m2*y**2)/2)*math.sqrt(b*y+(m1*y**2)/2+(m2*y**2)/2)/(math.sqrt(b+m1*y+m2*y)))
     return ecuacion
 
-def derivada_yc_Rectangulo(Q,b,m,y):
-    derivada=-(10*m**2*y**2+10*b*m*y+3*b**2)*math.sqrt(m*y**2+b*y)/(2*(2*m*y+b)**(3/2))
+def derivada_yc_Rectangulo(Q,b,m1,m2,y):
+    derivada=((m1+m2)*(b*y+(m1*y**2)/2+(m2*y**2)/2)**(3/2))/(2*(b+m1*y+m2*y)**(3/2)) - (3/2)*math.sqrt(b+m1*y+m2*y)*math.sqrt(b*y+(m1*y**2)/2+(m2*y**2)/2)
+
     return derivada
 
 def ecuacion_yc_Circulo(Q,d,y):
@@ -96,22 +139,42 @@ def derivada_yc_Circulo(Q,d,y):
     derivada=((d**2*(2*math.asin((2*(y-d/2))/d)+math.sin(2*math.asin((2*(y-d/2))/d))+math.pi))**(3/2)*math.cos(1/2*(2*math.asin((2*(y-d/2))/d)+math.pi)))/(16*math.sqrt(2)*math.sqrt(1-(4*(y-d/2)**2)/d**2)*(d*math.sin(1/2*(2*math.asin((2*(y-d/2))/d)+math.pi)))**(3/2))-(3*d**2*math.sqrt(d**2*(2*math.asin((2*(y-d/2))/d)+math.sin(2*math.asin((2*(y-d/2))/d))+math.pi))*(4/(d*math.sqrt(1-(4*(y-d/2)**2)/d**2))+(4*math.cos(2*math.asin((2*(y-d/2))/d)))/(d*math.sqrt(1-(4*(y-d/2)**2)/d**2))))/(32*math.sqrt(2)*math.sqrt(d*math.sin(1/2*(2*math.asin((2*(y-d/2))/d)+math.pi))))        
     return derivada
 
-def yc(Q,b,m,d):  
+def yc(Q,b,m1,m2,um,d,ub,ud,uQ):  
     """Calcula la profundidad crítica. Para secciones rectángulares se recurre a una solución analítica. Para las demás se recurre a una solución numérica (Newton-Raphson)\n
     Q = caudal (m3/s) <br />
     b = base (m) <br />
-    m = inclinación <br />
-    d = diámetro (m) \n    
-     Los parámetros que no se requieran, se dejan en 0"""
+    m1 = inclinación lado 1<br />
+    m2 = inclinación lado 2<br />
+    um = unidades de m (grados, radianes, m/m)<br />
+    d = diámetro (m) \n  
+    u_b=unidades de b (mm, cm, m, in)<br />
+    u_d=unidades de d (mm, cm, m, in)<br />
+    u_Q = unidades de caudal--> L, m3 <br />
+    Los parámetros que no se requieran, se dejan en 0"""
+    
+    b=CU_m(b,ub)
+    d=CU_m(d,ud)
+    m1=CU_theta(m1,um)
+    m2=CU_theta(m2,um)
+    m1=math.tan(math.radians(m1))
+    m2=math.tan(math.radians(m2))
+    
+    
+    if uQ=='L':
+        Q=Q/1000
+    
+    
+    
     if d==0:        
-        if m==0:
-            yc=((Q**2)/(9.81*(b**2)))**(1/3)
+        if m1==0:
+            if m2==0:
+                yc=((Q**2)/(9.81*(b**2)))**(1/3)
         else:
             error=1
             y=b
             
             while error>0.0001:
-                yc=y-ecuacion_yc_Rectangulo(Q,b,m,y)/derivada_yc_Rectangulo(Q,b,m,y)
+                yc=y-ecuacion_yc_Rectangulo(Q,b,m1,m2,y)/derivada_yc_Rectangulo(Q,b,m1,m2,y)
                 error=abs(yc-y)
                 y=yc
     else:
@@ -125,29 +188,49 @@ def yc(Q,b,m,d):
     return float(yc)
 
 '-----------------------------------------------------------------------------'
-def vc (m,b,y,d):
+def vc (m,b,y,d,uy,ub,ud):
     """Calcula la velocidad crítica a partir de Froude y geometría crítica\n
     m = inclinación de lados <br>
     b = base (m) <br>
     y = profundidad crítica (m) <br>
     d = diámetro (m) \n
+    u_y=unidades de y (mm, cm, m, in)<br />
+    u_b=unidades de b (mm, cm, m, in)<br />
+    u_d=unidades de d (mm, cm, m, in)<br />
+    
     Los parámetros que no sean necesarios se dejan en 0"""
+    y=CU_m(b,uy)
+    b=CU_m(b,ub)
+    d=CU_m(d,ud)
+    
     if d==0:
-        A,P,Rh,T,D = geom_r(y,b,m)
+        A,P,Rh,T,D = geom_r(y,b,m,"m","m")
     else:
         ynd=y/d
-        yn,theta,A,P,Rh,T,D=geom_c(d,ynd)
+        yn,theta,A,P,Rh,T,D=geom_c(d,ynd,"m")
     
     v=math.sqrt(9.81*A/T)
     return v
     
 '-----------------------------------------------------------------------------'
-def momentum(Q,b,m,y,d):
+def momentum(Q,b,m,y,d,uQ,ub,uy,ud):
     """Calcula momentum de una sección a partir de geometría y caudal\n
     Q = caudal (m3/s) <br />
+    y = profundidad <br />
     b = base (m) <br />
     m = inclinación <br />
-    d = diámetro (m)"""    
+    d = diámetro (m) <br />
+    u_y=unidades de y (mm, cm, m, in)<br />
+    u_b=unidades de b (mm, cm, m, in)<br />
+    u_d=unidades de d (mm, cm, m, in)<br />
+    u_Q = unidades de caudal--> L, m3 <br />"""   
+    
+    y=CU_m(y,uy)
+    b=CU_m(b,ub)
+    d=CU_m(d,ud)
+    if uQ=='L':
+        Q=Q/1000
+        
     if d==0:        
         if m==0:
             mom=y**2/2+(Q/b)**2/(9.81*y)
@@ -165,15 +248,26 @@ def momentum(Q,b,m,y,d):
 '-----------------------------------------------------------------------------'
 '    Falta probar los no rectangulares'
 
-def fuerzaCompuerta(y1,y2,b,Q,m,rho):
+def fuerzaCompuerta(y1,y2,b,Q,m,rho,uy1,uy2,ub,uQ):
     """Calcula fuerza sobre la compuerta en canales primáticos\n
     y1= profundidad de sección 1 <br />
     y2= profundidad de sección 2 <br />
     b = base (m) <br />
     Q = caudal (m3/s) <br />
     m = inclinación <br />
-    rho = densidad (kg/m3)"""
-
+    rho = densidad (kg/m3)
+    uy1=unidades de y1 (mm, cm, m, in)<br />
+    uy2=unidades de y1 (mm, cm, m, in)<br />
+    ub=unidades de b (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3 <br />
+    """
+    y1=CU_m(y1,uy1)
+    y2=CU_m(y2,uy2)
+    ub=CU_m(b,ub)
+    
+    if uQ=='L':
+        Q=Q/1000
+    
     M1=momentum(Q,b,m,y1,0)
     M2=momentum(Q,b,m,y2,0)
     
@@ -201,15 +295,23 @@ def derivadaTrapecio(Q,b,m,y1,y2,f):
     return derivada
 
 
-def y_subsecuente(Q,b,m,y1,f):
+def y_subsecuente(Q,b,m,y1,f,uy1,ub,uQ):
     """Calcula profundidad subsecuente por medio de conservación del momento. Para canales rectangulares se utiliza la solución analítica. Para los demás se recurre a una solución numérica (Newton Raphson).\n
     Q = caudal (m3/s) <br>
     b = base (m) <br>
     y1 = profundidad de sección 1 <br>
-    f=fuerza aplicada en caso de resalto forzado (si no es forzado, poner 0)"""
+    f=fuerza aplicada en caso de resalto forzado (si no es forzado, poner 0)
+    ub = unidades de b (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3 <br />
+    uy1 = unidades y1 (mm ,cm ,m , in)"""
+    
+    y1=CU_m(y1,uy1)
+    b=CU_m(b,ub)
+    if uQ=='L':
+        Q=Q/1000
     
     if m==0:
-        Fr=froude(y1,b,m,Q,0,0)
+        Fr=froude(y1,b,m,Q,0,0,"m","m","m3")
         y2=y1/2*(math.sqrt(1+8*Fr**2)-1)
     elif b==0:
         error=1
@@ -228,14 +330,22 @@ def y_subsecuente(Q,b,m,y1,f):
     return y2
 
 '-----------------------------------------------------------------------------'
-def eficienciaRH(Q,b,m,y1,f):
+def eficienciaRH(Q,b,m,y1,f,uy1,ub,uQ):
     """Calcula eficiencia del RH a partir del caudal, geometría aguas arriba y fuerza en caso de ser forzado\n
     Q = caudal (m3/s) <br>
     b = base (m) <br>
     y1 = profundidad en sección 1 <br>
-    f = fuerza aplicada en caso de resalto forzado (si no es forzado, poner 0)"""
+    f = fuerza aplicada en caso de resalto forzado (si no es forzado, poner 0)
+    ub = unidades de b (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3 <br />
+    uy1 = unidades y1 (mm ,cm ,m , in)"""
     
-    y2=y_subsecuente(Q, b, m, y1,f)
+    y1=CU_m(y1,uy1)
+    b=CU_m(b,ub)
+    if uQ=='L':
+        Q=Q/1000
+    
+    y2=y_subsecuente(Q, b, m, y1,f,"m","m","m3")
     
     A1,P1,Rh1,T1,D1=geom_r(y1,b,m)
     A2,P2,Rh2,T2,D2=geom_r(y2,b,m)
@@ -248,16 +358,31 @@ def eficienciaRH(Q,b,m,y1,f):
     return eficiencia
 
 '-----------------------------------------------------------------------------'
-def eficienciaRHI(Q,b,m,y1,yn,l,theta):
+def eficienciaRHI(Q,b,m,y1,yn,l,i,uQ,ub,uy1,ul,ui):
     """Calcula eficiencia del RH inclinado a partir del caudal, geometría aguas arriba, inclinación del canal y longitud de la parte inclinada del canal (utilizar gráfica)\n
     Q = caudal (m3/s) <br>
     b = base (m) <br>
     y1 = profundidad en sección 1 <br>
     l = longitud de la parte inclinada del resalto (m) <br>
-    theta = inclinación del canal en grados"""
-    z=l*math.tan(math.radians(theta))
-    A1,P1,Rh1,T1,D1=geom_r(y1,b,m)
-    A2,P2,Rh2,T2,D2=geom_r(yn,b,m)
+    i = inclinación del canal (grados, radianes, m/m)
+    ub = unidades de b (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3 <br />
+    uy1 = unidades y1 (mm ,cm ,m , in) <br />
+    ul = unidades de longitud--> (mm ,cm ,m , in) 
+    ui = unidades de inclinacion--> grados, radianes, m/m <br />"""
+    
+    y1=CU_m(y1,uy1)
+    b=CU_m(b,ub)
+    l=CU_m(l,ul)
+    if uQ=='L':
+        Q=Q/1000
+        
+    inclinacion=CU_theta(i,ui)
+
+    
+    z=l*math.tan(math.radians(inclinacion))
+    A1,P1,Rh1,T1,D1=geom_r(y1,b,m,"m","m")
+    A2,P2,Rh2,T2,D2=geom_r(yn,b,m,"m","m")
 
     E1=y1+Q**2/(2*9.81*A1**2)+z
     E2=yn+Q**2/(2*9.81*A2**2)
@@ -266,14 +391,23 @@ def eficienciaRHI(Q,b,m,y1,yn,l,theta):
     
     return eficiencia
 '-----------------------------------------------------------------------------'
-def clasificacionResalto(Q,b,m,y):
+def clasificacionResalto(Q,b,m,y,ub,uy,uQ):
     """Clasifica resalto con el número de Froude a partir de las propiedades geométricas aguas arriba\n
     Q = caudal (m3/s) <br>
     b = base (m) <br>
     m = inclinación <br>
-    y = profundidad aguas arriba"""
-    A,P,Rh,T,D=geom_r(y,b,m)
-    Fr=froude(y,b,m,Q,0,0)
+    y = profundidad aguas arriba <br />
+    ub = unidades de b (mm, cm, m, in)<br />
+    uy = unidades de y (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3"""
+    
+    y=CU_m(y,uy)
+    b=CU_m(b,ub)
+    if uQ=='L':
+        Q=Q/1000
+    
+    A,P,Rh,T,D=geom_r(y,b,m,"m","m")
+    Fr=froude(y,b,m,Q,0,"m","m","m","m3")
     if Fr<1:
         return 'Flujo subcrítico'
     elif Fr<=1.7:
@@ -288,16 +422,27 @@ def clasificacionResalto(Q,b,m,y):
         return 'RH fuerte'
     
 '-----------------------------------------------------------------------------'
-def longitudResalto(y,b,m,Q,d):
+def longitudResalto(y,b,m,Q,d,uy,ub,uQ,ud):
     """Calcula la longitud del resalto. Círculo, rectángulo, triángulo y trapecial (m=0.5,1 o 2)\n
     y = profundidad aguas arriba (m) <br>
     b = base (m) <br>
     Q = caudal (m3/s) <br>
-    d = diámetro (m)\n
+    d = diámetro (m)<br>
+    ub = unidades de b (mm, cm, m, in)<br />
+    uy = unidades de y (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3 <br />
+    ud = unidades de d (mm, cm, m, in)\n
     
     Los parámetros que no se requieran se dejan en 0"""
     
-    Fr=froude(y,b,m,Q,d)
+    y=CU_m(y,uy)
+    b=CU_m(b,ub)
+    d=CU_m(y,ud)
+    if uQ=='L':
+        Q=Q/1000
+
+    
+    Fr=froude(y,b,m,Q,d,"m","m","m","m3")
     if d!=0:
         Lr=y*(11.7*(Fr-1)**0.832)
     elif m==0:
@@ -314,28 +459,56 @@ def longitudResalto(y,b,m,Q,d):
     return Lr
 
 '-----------------------------------------------------------------------------'    
-def y_asterisco(Q,b,y1,theta):
+def y_asterisco(Q,b,y1,i,ub,uy1,uQ,ui):
     """Calcula y asterisco de secciones rectangulares.\n
     y1 = profundidad aguas arriba (m) <br>
     b = base (m) <br>
     Q = caudal (m3/s) <br>
-    theta = inclinación del canal en grados"""
-    Fr=froude(y1,b,0,Q,0,0)
+    i = inclinación del canal (grados, radianes, m/m) <br />
+    ub = unidades de b (mm, cm, m, in)<br />
+    uy1 = unidades de y1 (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3 <br />
+    ui = unidades de inclinacion (mm, cm, m, in)\n
+    
+    Los parámetros que no se requieran se dejan en 0"""
+    
+    y1=CU_m(y1,uy1)
+    b=CU_m(b,ub)
+    if uQ=='L':
+        Q=Q/1000
+    
+    Fr=froude(y1,b,0,Q,0,"m","m","m","m3")
+    
+    theta=CU_theta(i,ui)
+    
+
     Tau=10**(0.027*theta)
     y=y1/2*(math.sqrt(1+8*Fr**2*Tau**2)-1)
     return y
 
 '-----------------------------------------------------------------------------'
-def tipoResalto(Q,b,y,yn,theta):
+def tipoResalto(Q,b,y,yn,theta,uQ,ub,uy,uyn,ui):
     """Establece de qué tipo de resalto se trata a partir de geometría del canal y la profundidad natural.\n
     y = profundidad aguas arriba (m) <br>
     b = base (m) <br>
     Q = caudal (m3/s) <br>
     yn = profundidad natural aguas abajo (m) <b>
-    theta = inclinación del canal en grados"""
+    theta = inclinación del canal (grados, radianes, m/m)
+    ub = unidades de b (mm, cm, m, in)<br />
+    uy = unidades de y (mm, cm, m, in)<br />
+    uyn = unidades de yn (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3 <br />
+    ui = unidades de inclinacion (mm, cm, m, in)"""
     
-    y2=y_subsecuente(Q,b,0,y,0)
-    y_a=y_asterisco(Q,b,y,theta)
+    y=CU_m(y,uy)
+    b=CU_m(b,ub)
+    yn=CU_m(yn,uyn)
+    theta=CU_theta(theta,ui)
+    if uQ=='L':
+        Q=Q/1000
+    
+    y2=y_subsecuente(Q,b,0,y,0,"m","m","m3")
+    y_a=y_asterisco(Q,b,y,theta,"m","m","m3","grados")
     if y2>yn:
         return 'tipo A'
     elif y_a==yn:
@@ -359,7 +532,7 @@ def derivadaManning_circ(Q,n,So,y,d,kn):
     derivada=-(d**2*kn*(d**2*(-2*math.asin(1-(2*y)/d)-math.sin(2*math.asin(1-(2*y)/d))+math.pi))**(2/3)*(2*math.sin(2*math.asin(1-(2*y)/d))+5*math.pi*math.cos(2*math.asin(1-(2*y)/d))-2*math.asin(1-(2*y)/d)*(5*math.cos(2*math.asin(1-(2*y)/d))+3)+3*math.pi))/(24*2**(1/3)*math.sqrt((y*(d-y))/d**2)*(d*(math.pi-2*math.asin(1-(2*y)/d)))**(5/3))
     return derivada
 
-def yn_manning(Q,n,So,m,b,d,i):
+def yn_manning(Q,n,So,m,b,d,i,uQ,ub,ud,uSo):
     """calcula yn con la ecuación de Manning por medio de Newton-Raphson\n
     Q = caudal (m3/s) <br>
     n = número de Manning <br>
@@ -367,7 +540,19 @@ def yn_manning(Q,n,So,m,b,d,i):
     m = inclinación de los lados <br>
     b = base (m) <br>
     d = diámetro (m) <br>
-    i = sistema inglés (in) o sistema internacional (si)"""
+    i = sistema inglés (in) o sistema internacional (si)
+    ub = unidades de b (mm, cm, m, in)<br />
+    ud = unidades de d (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3 <br />
+    uSo = unidades de inclinacion (mm, cm, m, in)"""
+    
+    d=CU_m(d,ud)
+    b=CU_m(b,ub)
+    So=CU_theta(So,uSo)
+    So=math.tan(math.radians(So))
+    if uQ=='L':
+        Q=Q/1000
+    
     if i.lower()=='in':
         kn=1.49
         
@@ -391,39 +576,56 @@ def yn_manning(Q,n,So,m,b,d,i):
     return y
 '-----------------------------------------------------------------------------'
     
-def pendienteC_limite(n,Q,b,m,d):
+def pendienteC_limite(n,Q,b,m,d,uQ,ub,ud):
     """Calcula la pendiente crítica a partir de la geometría, el caudal máximo y el n de Manning\n
     n = número de Manning <br>
     Q = caudal (m3/s) <br>
     b = base (m) <br>
     m = inclinación de los lados <br>
     d = diámetro\n
+    ub = unidades de b (mm, cm, m, in)<br />
+    ud = unidades de d (mm, cm, m, in)<br />
+    uQ = unidades de caudal--> L, m3 <br />
     Los parámetros que no sean necesarios se dejan como 0"""
     
-    y = yc(Q,b,m,d)
+    d=CU_m(d,ud)
+    b=CU_m(b,ub)
+    if uQ=='L':
+        Q=Q/1000
+    
+    
+    y = yc(Q,b,m,d,"m","m","m3")
     
     if d == 0:
-        A,P,Rh,T,D=geom_r(y,b,m)
+        A,P,Rh,T,D=geom_r(y,b,m,"m","m")
     else:
         ynd=y/d
-        yn,theta,A,P,Rh,T,D=geom_c(d,ynd)
+        yn,theta,A,P,Rh,T,D=geom_c(d,ynd,"m")
     Sc = Q**2*n**2*P**(4/3)/(A**(10/3))
     return Sc
 
-def pendienteC_especifica(n,m,b,y,d):
+def pendienteC_especifica(n,m,b,y,d,ub,uy,ud):
     """Calcula la pendiente crítica a partir de la geometría, yc y el n de Manning\n
     n = número de Manning <br>
     yc = profundidad crítica <br>
     b = base (m) <br>
     m = inclinación de los lados <br>
     d = diámetro\n
+    ub = unidades de b (mm, cm, m, in)<br />
+    ud = unidades de d (mm, cm, m, in)<br />
+    uy = unidades de y (mm, cm, m, in) <br />
     Los parámetros que no sean necesarios se dejan como 0"""
-    v=vc(m,b,y,d)
+    
+    d=CU_m(d,ud)
+    b=CU_m(b,ub)
+    y=CU_m(y,uy)
+    
+    v=vc(m,b,y,d,"m","m","m")
     if d == 0:
-        A,P,Rh,T,D=geom_r(y,b,m)
+        A,P,Rh,T,D=geom_r(y,b,m,"m","m")
     else:
         ynd=y/d
-        yn,theta,A,P,Rh,T,D=geom_c(d,ynd)
+        yn,theta,A,P,Rh,T,D=geom_c(d,ynd,"m")
     Sc=v**2*n**2/(Rh**(4/3))
     return Sc
 '-----------------------------------------------------------------------------'
@@ -440,7 +642,7 @@ def funcionIntegral_circular(y,Q,n,So,d):
     f=((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
     return f
 
-def fgv_int(Q,n,So,b,m,d,y1,y2):
+def fgv_int(Q,n,So,b,m,d,y1,y2,uQ,uSo,ub,ud,uy1,uy2):
     """Calcula la longitud que requiere el flujo para pasar de una profundidad a otra\n
     Q = caudal (m3/s) <br>
     n = número de Manning <br>
@@ -449,7 +651,23 @@ def fgv_int(Q,n,So,b,m,d,y1,y2):
     m = inclinación de los lados <br>
     d = diámetro (m) <br>
     y1 = profundidad de control (m) <br>
-    y2 = profundidad objetivo (m)"""
+    y2 = profundidad objetivo (m)
+    uQ = unidades de caudal--> L, m3 <br />
+    uSo = unidades de inclinacion (mm, cm, m, in)
+    ub = unidades de b (mm, cm, m, in)<br />
+    ud = unidades de d (mm, cm, m, in)<br />
+    uy1 = unidades de uy1 (mm, cm, m, in)<br />
+    uy2 = unidades de uy2 (mm, cm, m, in)<br />"""
+    
+    b=CU_m(b,ub)
+    d=CU_m(d,ud)
+    y1=CU_m(y1,uy1)
+    y2=CU_m(y2,uy2)
+    So=CU_theta(So,uSo)
+    So=math.tan(math.radians(So))
+    if uQ=='L':
+        Q=Q/1000
+    
     
     if d==0:
         x=integrate.quadrature(funcionIntegral_rectangular,y1,y2,args=(Q,n,So,b,m),tol=1e-8)[0]
@@ -457,7 +675,7 @@ def fgv_int(Q,n,So,b,m,d,y1,y2):
         x=integrate.quadrature(funcionIntegral_circular,y1,y2,args=(Q,n,So,d),tol=1e-8)[0] #no cuadra con el resultado de calculadora
     return x
 
-def pasoDirecto(Q,n,So,b,m,d,y_control,y_obj,pasos,datum):
+def pasoDirecto(Q,n,So,b,m,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     """Calcula el perfil de un flujo gradualmente variado a partir de una aproximación de diferencias finitas. Distancia entre dos profundidades conocidas\n
     Q = caudal (m3/s) <br>
     n = número de Manning <br>
@@ -466,7 +684,23 @@ def pasoDirecto(Q,n,So,b,m,d,y_control,y_obj,pasos,datum):
     m = inclinación de los lados <br>
     d = diámetro (m) <br>
     y1 = profundidad de control (m) <br>
-    y2 = profundidad objetivo (m)"""
+    y2 = profundidad objetivo (m)
+    uQ = unidades de caudal--> L, m3 <br />
+    uSo = unidades de inclinacion (mm, cm, m, in)
+    ub = unidades de b (mm, cm, m, in)<br />
+    ud = unidades de d (mm, cm, m, in)<br />
+    uy1 = unidades de uy1 (mm, cm, m, in)<br />
+    uy2 = unidades de uy2 (mm, cm, m, in)<br />"""
+    
+    b=CU_m(b,ub)
+    d=CU_m(d,ud)
+    y_control=CU_m(y1,uy1)
+    y_obj=CU_m(y2,uy2)
+    So=CU_theta(So,uSo)
+    So=math.tan(math.radians(So))
+    if uQ=='L':
+        Q=Q/1000
+    
     
     plot_x=[]
     plot_yc=[]
@@ -538,18 +772,3 @@ def pasoDirecto(Q,n,So,b,m,d,y_control,y_obj,pasos,datum):
             y=y+deltaY
             p=p+1
     print (plot_yn, plot_fondo)
-        
-        
-
-
-
-
-
-#algoritmoSeleccionado = sys.argv[1]
-
-#if algoritmoSeleccionado.lower() == 'geometria':
-#    print("Esta función retorna las propiedades geométricas de la tubería o canal!")
- #   geometria ()
-#elif algoritmoSeleccionado.lower() == 'f':
-#    print("Esta función calcula la fuerza aplicada sobre una compuerta de flujo inferior a partir de conservación del momentum!")
-#    fuerzaCompuerta()
