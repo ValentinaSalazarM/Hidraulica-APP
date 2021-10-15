@@ -513,7 +513,7 @@ def clasificacionResalto(Q,b,m1,m2,d,ud,um,y,ub,uy,uQ):
         return (Fr,),('RH fuerte')
     
 '-----------------------------------------------------------------------------'
-def longitudResalto(y,b,m,Q,d,uy,ub,uQ,ud,um):
+def longitudResalto(y,b,m1,m2,Q,d,uy,ub,uQ,ud,um):
     """Calcula la longitud del resalto. Círculo, rectángulo, triángulo y trapecial (m=0.5,1 o 2) con ecuaciones empíricas\n
     y = profundidad aguas arriba (m) <br>
     b = base (m) <br>
@@ -525,30 +525,34 @@ def longitudResalto(y,b,m,Q,d,uy,ub,uQ,ud,um):
     ud = unidades de d (mm, cm, m, in)\n
     
     Los parámetros que no se requieran se dejan en 0"""
+    if m1==m2:
+        m=m1
     
-    y=CU_m(y,uy)
-    b=CU_m(b,ub)
-    d=CU_m(y,ud)
-    if uQ=='L':
-        Q=Q/1000
-    m=CU_theta(m,um)
-    m=math.tan(math.radians(m))
-    
-    Fr=froude(y,b,m,m,"m",Q,0,d,"m","m","m","m3/s")
-    if d!=0:
-        Lr=y*(11.7*(Fr-1)**0.832)
-    elif m==0:
-        Lr=y*(9.75*(Fr-1)**1.01)
-    elif b==0:
-        Lr=y*(4.26*(Fr-1)**0.695)
+        y=CU_m(y,uy)
+        b=CU_m(b,ub)
+        d=CU_m(y,ud)
+        if uQ=='L':
+            Q=Q/1000
+        m=CU_theta(m,um)
+        m=math.tan(math.radians(m))
+        
+        Fr=froude(y,b,m,m,"m",Q,0,d,"m","m","m","m3/s")
+        if d!=0:
+            Lr=y*(11.7*(Fr-1)**0.832)
+        elif m==0:
+            Lr=y*(9.75*(Fr-1)**1.01)
+        elif b==0:
+            Lr=y*(4.26*(Fr-1)**0.695)
+        else:
+            if m==0.5:
+                Lr=y*(35*(Fr-1)**0.836)
+            elif m==1:
+                Lr=y*(23*(Fr-1)**0.885)
+            elif m==2:
+                Lr=y*(17.6*(Fr-1)**0.905)
+        return Lr
     else:
-        if m==0.5:
-            Lr=y*(35*(Fr-1)**0.836)
-        elif m==1:
-            Lr=y*(23*(Fr-1)**0.885)
-        elif m==2:
-            Lr=y*(17.6*(Fr-1)**0.905)
-    return Lr
+        return "m1 tiene que ser igual a m2 para la aplicación de esté método empírico"
 
 '-----------------------------------------------------------------------------'    
 def y_asterisco(Q,b,y1,i,ub,uy1,uQ,ui):
@@ -578,7 +582,7 @@ def y_asterisco(Q,b,y1,i,ub,uy1,uQ,ui):
     return y
 
 '-----------------------------------------------------------------------------'
-def tipoResalto(Q,b,y,yn,theta,uQ,ub,uy,uyn,ui):
+def tipoResalto(Q,b,y,m1,m2,yn,theta,uQ,ub,uy,uyn,ui):
     """Establece de qué tipo de resalto se trata a partir de geometría del canal y la profundidad natural.\n
     y = profundidad aguas arriba (m) <br>
     b = base (m) <br>
@@ -591,23 +595,26 @@ def tipoResalto(Q,b,y,yn,theta,uQ,ub,uy,uyn,ui):
     uQ = unidades de caudal--> L, m3 <br />
     ui = unidades de inclinacion (mm, cm, m, in)"""
     
-    y=CU_m(y,uy)
-    b=CU_m(b,ub)
-    yn=CU_m(yn,uyn)
-    theta=CU_theta(theta,ui)
-    if uQ=='L':
-        Q=Q/1000
-    
-    y2=y_subsecuente(Q,b,0,y,0,"m","m","m3")
-    y_a=y_asterisco(Q,b,y,theta,"m","m","m3","grados")
-    if y2>yn:
-        return (y2,y_a),('tipo A',)
-    elif y_a==yn:
-        return (y2,y_a),('tipo C',)
-    elif y_a>yn:
-        return (y2,y_a),('tipo B',)
-    elif y_a<yn:
-        return (y2,y_a),('tipo D',)
+    if m1==0 and m2==0:
+        y=CU_m(y,uy)
+        b=CU_m(b,ub)
+        yn=CU_m(yn,uyn)
+        theta=CU_theta(theta,ui)
+        if uQ=='L':
+            Q=Q/1000
+        
+        y2=y_subsecuente(Q,b,0,0,0,y,0,"m","m","m3/s")
+        y_a=y_asterisco(Q,b,y,theta,"m","m","m3/s","grados")
+        if y2>yn:
+            return (y2,y_a),('tipo A',)
+        elif y_a==yn:
+            return (y2,y_a),('tipo C',)
+        elif y_a>yn:
+            return (y2,y_a),('tipo B',)
+        elif y_a<yn:
+            return (y2,y_a),('tipo D',)
+    else:
+        return "Este método solo está disponible para secciones rectangulares"
     
 '-----------------------------------------------------------------------------'
 def ecuacionManning_canal(Q,n,So,m1,m2,b,y,kn):    
