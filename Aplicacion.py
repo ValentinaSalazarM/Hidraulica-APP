@@ -748,45 +748,14 @@ def pendienteC_especifica(n,y,b,m1,m2,um,d,ub,ud,uy):
     Sc=v**2*n**2/(Rh**(4/3))
     return Sc
 
-def condicionCritica(n,Q,b,y,m1,m2,um,d,uQ,ub,ud,uy):
-    """Integración códigos para interfaz\n
-    n = número de Manning <br>
-    Q = caudal (m3/s) <br>
-    b = base (m) <br>
-    y = profundidad crítica <br>
-    m1 = inclinación lado 1<br />
-    m2 = inclinación lado 2<br />
-    um = unidades de m (grados, radianes, m/m)<br />
-    d = diámetro\n
-    ub = unidades de b (mm, cm, m, in)<br />
-    ud = unidades de d (mm, cm, m, in)<br />
-    uQ = unidades de caudal--> L, m3 <br />
-    Los parámetros que no sean necesarios se dejan como 0"""
-    
-    d=CU_m(d,ud)
-    b=CU_m(b,ub)
-    y=CU_m(y,uy)
-    if uQ=='L':
-        Q=Q/1000
-    m1=CU_theta(m1,um)
-    m2=CU_theta(m2,um)
-    m1=math.tan(math.radians(m1))
-    m2=math.tan(math.radians(m2))
-    
-    
-    if y==0:
-        y,v,Sc=pendienteC_limite(n, Q, b, m1, m2, um, d, uQ, ub, ud)
-        
-    else:
-        v=vc(m1,m2,"m",b,y,d,"m","m","m")
-        Sc=pendienteC_especifica(n,y,b,m1,m2,"m",d,"m","m","m")
-    
-    return y,v,Sc
 
 
 '-----------------------------------------------------------------------------'
-def funcionIntegral_rectangular(y,Q,n,So,b,m):
-    f = ((1-(Q**2*(b+2*m*y))/(9.81*(b*y+m*y**2)**3))/(So-((n**2*Q**2*(b+2*y*math.sqrt(m**2+1))**(4/3))/((b*y+m*y**2)**(10/3)))))
+def funcionIntegral_rectangular(y,Q,n,So,b,m1,m2):
+    A = b*y+(m1*y**2)/2+(m2*y**2)/2
+    P=b+y*np.sqrt(m1**2+1)+y*np.sqrt(m2**2+1)
+    T=b+m1*y+m2*y
+    f = f=((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
     return f
 
 def funcionIntegral_circular(y,Q,n,So,d):
@@ -798,13 +767,15 @@ def funcionIntegral_circular(y,Q,n,So,d):
     f=((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
     return f
 
-def fgv_int(Q,n,So,b,m,d,y1,y2,uQ,uSo,ub,ud,uy1,uy2):
+def fgv_int(Q,n,So,b,m1,m2,um,d,y1,y2,uQ,uSo,ub,ud,uy1,uy2):
     """Calcula la longitud que requiere el flujo para pasar de una profundidad a otra\n
     Q = caudal (m3/s) <br>
     n = número de Manning <br>
     So = Inclinación del canal <br>
     b = base (m) <br>
-    m = inclinación de los lados <br>
+    m1 = inclinación lado 1<br />
+    m2 = inclinación lado 2<br />
+    um = unidades de m (grados, radianes, m/m)<br />
     d = diámetro (m) <br>
     y1 = profundidad de control (m) <br>
     y2 = profundidad objetivo (m)
@@ -823,21 +794,27 @@ def fgv_int(Q,n,So,b,m,d,y1,y2,uQ,uSo,ub,ud,uy1,uy2):
     So=math.tan(math.radians(So))
     if uQ=='L':
         Q=Q/1000
+    m1=CU_theta(m1,um)
+    m2=CU_theta(m2,um)
+    m1=math.tan(math.radians(m1))
+    m2=math.tan(math.radians(m2))
     
     
     if d==0:
-        x=integrate.quadrature(funcionIntegral_rectangular,y1,y2,args=(Q,n,So,b,m),tol=1e-8)[0]
+        x=integrate.quadrature(funcionIntegral_rectangular,y1,y2,args=(Q,n,So,b,m1,m2),tol=1e-8)[0]
     else:
         x=integrate.quadrature(funcionIntegral_circular,y1,y2,args=(Q,n,So,d),tol=1e-8)[0] #no cuadra con el resultado de calculadora
     return x
 
-def pasoDirecto(Q,n,So,b,m,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
+def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     """Calcula el perfil de un flujo gradualmente variado a partir de una aproximación de diferencias finitas. Distancia entre dos profundidades conocidas\n
     Q = caudal (m3/s) <br>
     n = número de Manning <br>
     So = Inclinación del canal <br>
     b = base (m) <br>
-    m = inclinación de los lados <br>
+    m1 = inclinación lado 1<br />
+    m2 = inclinación lado 2<br />
+    um = unidades de m (grados, radianes, m/m)<br />
     d = diámetro (m) <br>
     y1 = profundidad de control (m) <br>
     y2 = profundidad objetivo (m)
@@ -856,6 +833,10 @@ def pasoDirecto(Q,n,So,b,m,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     So=math.tan(math.radians(So))
     if uQ=='L':
         Q=Q/1000
+    m1=CU_theta(m1,um)
+    m2=CU_theta(m2,um)
+    m1=math.tan(math.radians(m1))
+    m2=math.tan(math.radians(m2))
     
     
     plot_x=[]
@@ -869,12 +850,12 @@ def pasoDirecto(Q,n,So,b,m,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     
     deltaY=(y_obj-y_control)/pasos
     
-    y_c=yc(Q,b,m,0)
+    y_c=yc(Q,b,0,m1,m2,"m",d,"m","m","m")
     
     if So!=0:
-        yn=yn_manning(Q,n,So,m,b,0,'si')
+        yn=yn_manning(Q,n,So,m1,m2,"m",b,d,"si","m","m","m","m")
     
-    Sc=pendienteC_limite(n,Q,b,m,0)
+    Sc=pendienteC_limite(n,Q,b,m1,m2,"m",d,"m","m","m")
     
     if So<Sc:
         print ('suave')
@@ -896,7 +877,7 @@ def pasoDirecto(Q,n,So,b,m,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     
     if d==0:
         while p<=pasos:
-            A,P,Rh,T,D=geom_r(y, b, m)
+            A,P,Rh,T,D=geom_r(y,b,m1,m2,"m","m","m")
             v=Q/A
             E=y+v**2/(2*9.81)
             Sf= Q**2*n**2*P**(4/3)/(A**(10/3))
