@@ -151,7 +151,7 @@ def ecuacion_yc_Circulo(Q,v,d,y):
     if Q!=0:
         ecuacion=(Q/math.sqrt(9.81))-((((d**2)/8)*(math.pi+2*math.asin((y-(d/2))/(d/2))-math.sin(math.pi+2*math.asin((y-(d/2))/(d/2)))))**(3/2)/(d*math.sin((math.pi+2*math.asin((y-(d/2))/(d/2)))/2))**(1/2))
     elif v!=0:
-        ecuacion=(Q/math.sqrt(9.81))-((((d**2)/8)*(math.pi+2*math.asin((y-(d/2))/(d/2))-math.sin(math.pi+2*math.asin((y-(d/2))/(d/2)))))**(1/2)/(d*math.sin((math.pi+2*math.asin((y-(d/2))/(d/2)))/2))**(1/2))
+        ecuacion=(v/math.sqrt(9.81))-((((d**2)/8)*(math.pi+2*math.asin((y-(d/2))/(d/2))-math.sin(math.pi+2*math.asin((y-(d/2))/(d/2)))))**(1/2)/(d*math.sin((math.pi+2*math.asin((y-(d/2))/(d/2)))/2))**(1/2))
     return ecuacion
 
 def derivada_yc_Circulo(Q,v,d,y):
@@ -307,11 +307,13 @@ def fuerzaCompuerta(y1,y2,b,Q,m1,m2,um,rho,uy1,uy2,ub,uQ):
     M1=momentum(Q,b,m1,m2,um,y1,0,"","m","m","m")
     M2=momentum(Q,b,m1,m2,um,y2,0,"","m","m","m")
     
+    F_a=M1-M2
+    
     if m1==0 and m2==0:
-        f=rho*9.81*b*(M1-M2)
+        f=rho*9.81*b*F_a
     else:
-        f=rho*9.81*(M1-M2)
-    return M1,M2,f
+        f=rho*9.81*F_a
+    return M1,M2,F_a,f
 
 
 '-----------------------------------------------------------------------------'
@@ -390,50 +392,52 @@ def y_subsecuente(Q,b,m1,m2,um,y1,f,uy1,ub,uQ):
     return y2
 
 '-----------------------------------------------------------------------------'
-def eficienciaRH(Q,b,m1,m2,um,y1,f,uy1,ub,uQ):
-    """Calcula eficiencia del RH a partir del caudal, geometría aguas arriba y fuerza en caso de ser forzado\n
-    Q = caudal (m3/s) <br>
-    b = base (m) <br>
-    m1 = inclinación lado 1<br />
-    m2 = inclinación lado 2<br />
-    um = unidades de m (grados, radianes, m/m)<br />
-    y1 = profundidad en sección 1 <br>
-    f = fuerza aplicada en caso de resalto forzado (si no es forzado, poner 0)
-    ub = unidades de b (mm, cm, m, in)<br />
-    uQ = unidades de caudal--> L, m3 <br />
-    uy1 = unidades y1 (mm ,cm ,m , in)"""
+# def eficienciaRH(Q,b,m1,m2,um,y1,f,uy1,ub,uQ):
+#     """Calcula eficiencia del RH a partir del caudal, geometría aguas arriba y fuerza en caso de ser forzado\n
+#     Q = caudal (m3/s) <br>
+#     b = base (m) <br>
+#     m1 = inclinación lado 1<br />
+#     m2 = inclinación lado 2<br />
+#     um = unidades de m (grados, radianes, m/m)<br />
+#     y1 = profundidad en sección 1 <br>
+#     f = fuerza aplicada en caso de resalto forzado (si no es forzado, poner 0) <br>
+#     ub = unidades de b (mm, cm, m, in)<br />
+#     uQ = unidades de caudal--> L, m3 <br />
+#     uy1 = unidades y1 (mm ,cm ,m , in)"""
     
-    y1=CU_m(y1,uy1)
-    b=CU_m(b,ub)
-    if uQ=='L':
-        Q=Q/1000
-    m1=CU_theta(m1,um)
-    m2=CU_theta(m2,um)
-    m1=math.tan(math.radians(m1))
-    m2=math.tan(math.radians(m2))
+#     y1=CU_m(y1,uy1)
+#     b=CU_m(b,ub)
+#     if uQ=='L':
+#         Q=Q/1000
+#     m1=CU_theta(m1,um)
+#     m2=CU_theta(m2,um)
+#     m1=math.tan(math.radians(m1))
+#     m2=math.tan(math.radians(m2))
     
-    y2=y_subsecuente(Q,b,m1,m2,"m",y1,f,"m","m","m3/s")
+#     y2=y_subsecuente(Q,b,m1,m2,"m",y1,f,"m","m","m3/s")
     
-    A1,P1,Rh1,T1,D1=geom_r(y1,b,m1,m2,"m","m","m")
-    A2,P2,Rh2,T2,D2=geom_r(y2,b,m1,m2,"m","m","m")
+#     A1,P1,Rh1,T1,D1=geom_r(y1,b,m1,m2,"m","m","m")
+#     A2,P2,Rh2,T2,D2=geom_r(y2,b,m1,m2,"m","m","m")
         
-    E1=y1+Q**2/(2*9.81*A1**2)
-    E2=y2+Q**2/(2*9.81*A2**2)+f
+#     E1=y1+Q**2/(2*9.81*A1**2)
+#     E2=y2+Q**2/(2*9.81*A2**2)+f
     
-    eficiencia=abs(E1-E2)/E1*100
+#     eficiencia=abs(E1-E2)/E1*100
     
-    return (E1, E2), (eficiencia,)
+#     return (E1, E2), (eficiencia,)
 
 '-----------------------------------------------------------------------------'
-def eficienciaRHI(Q,b,m1,m2,um,y1,yn,l,i,uQ,ub,uy1,ul,ui):
+def eficienciaRH(Q,b,m1,m2,um,y1,yn,f,l,i,uQ,ub,uy1,ul,ui):
     """Calcula eficiencia del RH inclinado a partir del caudal, geometría aguas arriba, inclinación del canal y longitud de la parte inclinada del canal (utilizar gráfica)\n
-    Q = caudal (m3/s) <br>
-    b = base (m) <br>
+    Q = caudal <br>
+    b = base <br>
     m1 = inclinación lado 1<br />
     m2 = inclinación lado 2<br />
     um = unidades de m (grados, radianes, m/m)<br />
     y1 = profundidad en sección 1 <br>
-    l = longitud de la parte inclinada del resalto (m) <br>
+    yn= profundidad natural del río <br>
+    f = fuerza aplicada en caso de resalto forzado (si no es forzado, poner 0) <br>
+    l = longitud de la parte inclinada del resalto <br>
     i = inclinación del canal (grados, radianes, m/m)
     ub = unidades de b (mm, cm, m, in)<br />
     uQ = unidades de caudal--> L, m3 <br />
@@ -450,17 +454,24 @@ def eficienciaRHI(Q,b,m1,m2,um,y1,yn,l,i,uQ,ub,uy1,ul,ui):
     m2=CU_theta(m2,um)
     m1=math.tan(math.radians(m1))
     m2=math.tan(math.radians(m2))
+    
+    if i!=0:    
+        inclinacion=CU_theta(i,ui)
+        z=l*math.tan(math.radians(inclinacion))
+    else:
+        z=0
         
-    inclinacion=CU_theta(i,ui)
-
-    
-    z=l*math.tan(math.radians(inclinacion))
     A1,P1,Rh1,T1,D1=geom_r(y1,b,m1,m2,"m","m","m")
-    A2,P2,Rh2,T2,D2=geom_r(yn,b,m1,m2,"m","m","m")
-
     E1=y1+Q**2/(2*9.81*A1**2)+z
-    E2=yn+Q**2/(2*9.81*A2**2)
     
+    if yn!=0:
+        A2,P2,Rh2,T2,D2=geom_r(yn,b,m1,m2,"m","m","m")
+        E2=yn+Q**2/(2*9.81*A2**2)
+    else:
+        y2=y_subsecuente(Q,b,m1,m2,"m",y1,f,"m","m","m3/s")
+        A2,P2,Rh2,T2,D2=geom_r(y2,b,m1,m2,"m","m","m")
+        E2=y2+Q**2/(2*9.81*A2**2)+f
+        
     eficiencia=abs(E1-E2)/E1*100
     
     return (E1, E2, z), (eficiencia,)
