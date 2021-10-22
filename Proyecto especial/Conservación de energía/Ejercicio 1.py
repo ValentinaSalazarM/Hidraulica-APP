@@ -21,7 +21,6 @@ v2 = symbols('v2')
 y1 = 15
 y2 = 3
 b=5
-inc=1
 m1=1
 m2=1
 
@@ -76,34 +75,45 @@ def cambio_angulo(unidad,propiedad):
         
         temp = 1/np.tan(np.pi/180*propiedad)
     
+    if unidad == 'radianes':
+        
+        temp = 1/np.tan(propiedad)
+        
     else:
         temp = propiedad
         
     return temp
 
-def Areas(y1,y2,b,inc,m1,m2):
+def Areas(y1,y2,b,m1,m2,uni,uni2):
     
     """ Esta función retorna el área transversal según la figura\n
     Parametros: 
         y1 (float) altura de la sección 1 
         y2 (float) altura de la sección 2 
         b (float) base del canal
-        inc (int) Pendiente del triangulo
-        m1 (int) Pendiente del lado izquierdo del canal 
+        m1 (int) Pendiente del lado izquierdo o pendientre triangular del canal 
         m2 (int) Pendiente del lado derecho del canal
+        uni Unidades propiedades (mm,cm,m,in)
+        uni2 Unidades angulo (grados,m)
     Retorna:
         float: El área de la sección transversal [m^2]
     """
     
-    if inc == 0 and m1 == 0 and m2 == 0:
+    y1 = cambio_unidades(uni,y1)
+    y2 = cambio_unidades(uni,y2)
+    b = cambio_unidades(uni,b)
+    m1 = cambio_angulo(uni2,m1)
+    m2 = cambio_angulo(uni2,m2)
+    
+    if m1 == 0 and m2 == 0:
         
         A1 = b * y1
         A2 = b * y2
         
-    if b == 0:
+    elif b == 0:
         
-        A1 = y1**2 * inc
-        A2 = y2**2 * inc
+        A1 = y1**2 * m1
+        A2 = y2**2 * m1
             
     else:
 
@@ -119,7 +129,7 @@ def Areas(y1,y2,b,inc,m1,m2):
         
     return A1,A2
 
-def CaudalSalidafun(y1,y2,v2,b,inc,m1,m2,g):
+def CaudalSalidafun(y1,y2,v2,b,m1,m2,g,uni,uni2):
     
     """Esta función retorna el caudal\n
     
@@ -128,15 +138,22 @@ def CaudalSalidafun(y1,y2,v2,b,inc,m1,m2,g):
         y2 (float) altura de la sección 2
         v2 (Symbol) velocidad de las sección dos para realizar el cálculo
         b (float) base del canal
-        inc (int) Pendiente del triangulo
-        m1 (int) Pendiente del lado izquierdo del canal 
+        m1 (int) Pendiente del lado izquierdo o pendiendel triangular del canal 
         m2 (int) Pendiente de lado derecho del canal
         g (float) Aceleración gravitacional, generalmente 9.81
+        uni Unidades propiedades (mm,cm,m,in)
+        uni2 Unidades angulo (grados,m)
     Retorna:
         float: El caudal [m^3/s]
     """
 
-    if inc == 0 and m1 == 0 and m2 == 0:
+    y1 = cambio_unidades(uni,y1)
+    y2 = cambio_unidades(uni,y2)
+    b = cambio_unidades(uni,b)
+    m1 = cambio_angulo(uni2,m1)
+    m2 = cambio_angulo(uni2,m2)
+
+    if m1 == 0 and m2 == 0:
         
         v1 = y2/y1 * v2
 
@@ -144,10 +161,10 @@ def CaudalSalidafun(y1,y2,v2,b,inc,m1,m2,g):
         
         v2 = round(solve(ecu1)[1],4)
         
-        Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
+        Q = v2 * Areas(y1,y2,b,m1,m2,uni,uni2)[1]
         
 
-    if b == 0:
+    elif b == 0:
         
         v1 = v2 * y2**2/y1**2
         
@@ -155,7 +172,7 @@ def CaudalSalidafun(y1,y2,v2,b,inc,m1,m2,g):
 
         v2 = round(solve(ecu1)[1],4)
         
-        Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
+        Q = v2 * Areas(y1,y2,b,m1,m2,uni,uni2)[1]
         
             
     else:
@@ -168,7 +185,7 @@ def CaudalSalidafun(y1,y2,v2,b,inc,m1,m2,g):
 
             v2 = round(solve(ecu1)[1],4)
             
-            Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
+            Q = v2 * Areas(y1,y2,b,m1,m2,uni,uni2)[1]
             
         else:
             
@@ -178,7 +195,7 @@ def CaudalSalidafun(y1,y2,v2,b,inc,m1,m2,g):
 
             v2 = round(solve(ecu1)[1],4)
             
-            Q = v2 * Areas(y1,y2,b,inc,m1,m2)[1]
+            Q = v2 * Areas(y1,y2,b,m1,m2,uni,uni2)[1]
         
     return round (Q,4)
 
@@ -189,9 +206,9 @@ def imprimir_valores():
         str: Mensaje con los valores de caudal y áreas
     """
     
-    msg1 = '\nEl área transversal 1 [m^2] es: '+str(round(Areas(y1,y2,b,inc,m1,m2)[0],3)) 
-    msg2 = '\nEl área transversal 2 [m^2] es: '+str(round(Areas(y1,y2,b,inc,m1,m2)[1],3)) 
-    msg3 = '\nEl cuadal [l/s] es: '+str(round(CaudalSalidafun(y1,y2,v2,b,inc,m1,m2,g)*1000,4)) 
+    msg1 = '\nEl área transversal 1 [m^2] es: '+str(round(Areas(y1,y2,b,m1,m2,'m','')[0],3)) 
+    msg2 = '\nEl área transversal 2 [m^2] es: '+str(round(Areas(y1,y2,b,m1,m2,'m','')[1],3)) 
+    msg3 = '\nEl cuadal [l/s] es: '+str(round(CaudalSalidafun(y1,y2,v2,b,m1,m2,g,'m','')*1000,4)) 
     
     temp = msg1 + msg2 +msg3 
     return temp

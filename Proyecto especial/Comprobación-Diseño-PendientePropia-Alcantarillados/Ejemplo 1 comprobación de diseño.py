@@ -43,7 +43,7 @@ def cambio_unidades(unidad,propiedad):
         
         temp = propiedad/100
     
-    if Unidades == 'pulgadas':
+    if Unidades == 'in':
         
         temp = propiedad/ 39.37
 
