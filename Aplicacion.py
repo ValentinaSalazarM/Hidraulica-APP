@@ -12,6 +12,7 @@ import math
 import sys
 import unidecode
 import scipy.integrate as integrate
+import os
 
 '-----------------------------------------------------------------------------'
 'Funciones para cambio de unidades'
@@ -755,16 +756,15 @@ def funcionIntegral_rectangular(y,Q,n,So,b,m1,m2):
     A = b*y+(m1*y**2)/2+(m2*y**2)/2
     P=b+y*np.sqrt(m1**2+1)+y*np.sqrt(m2**2+1)
     T=b+m1*y+m2*y
-    f = f=((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
+    f =((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
     return f
 
 def funcionIntegral_circular(y,Q,n,So,d):
     theta = np.pi+2*np.arcsin((y-(d/2))/(d/2))
     A= (theta-np.sin(theta))*d**2/8
     P= theta*d/2
-    T=2*np.sqrt(y*(d-y))
-    
-    f=((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
+    T=d*np.cos(np.arcsin((y-(d/2))/(d/2)))
+    f =((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
     return f
 
 def fgv_int(Q,n,So,b,m1,m2,um,d,y1,y2,uQ,uSo,ub,ud,uy1,uy2):
@@ -825,6 +825,15 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     uy1 = unidades de uy1 (mm, cm, m, in)<br />
     uy2 = unidades de uy2 (mm, cm, m, in)<br />"""
     
+
+    nombreArchivo='./Excel paso directo.csv'
+
+        
+    archivoSalida = open(nombreArchivo, 'w')
+    archivoSalida.write('Iteracion,y(m),A(m2),P(m),R(m),v(m/s),E(m),Sfi,Sfm,So-Sfm,deltaE(m),deltaX(m),x(m),Fondo (m), Profundidad (m), yc(m),yn(m)\n')
+    
+    
+    
     b=CU_m(b,ub)
     d=CU_m(d,ud)
     y_control=CU_m(y1,uy1)
@@ -846,27 +855,29 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     plot_y=[]
     
     
-    
-    
     deltaY=(y_obj-y_control)/pasos
     
     y_c=yc(Q,b,0,m1,m2,"m",d,"m","m","m")
     
     if So!=0:
         yn=yn_manning(Q,n,So,m1,m2,"m",b,d,"si","m","m","m","m")
+    else:
+        yn=0
+        
     
-    Sc=pendienteC_limite(n,Q,b,m1,m2,"m",d,"m","m","m")
+    y_c,v_c,Sc=pendienteC_limite(n,Q,b,m1,m2,"m",d,"m","m","m")
+    
     
     if So<Sc:
-        print ('suave')
+        tipo='suave'
     elif So>Sc:
-        print ('empinada')
+        tipo='empinada'
     elif So==Sc:
-        print ('crítica')
+        tipo='crítica'
     elif So==0:
-        print ('horizontal')
+        tipo= 'horizontal'
     elif So<0:
-        print ('adversa')
+        tipo='adversa'
     
     p=0
     y=y_control
@@ -889,13 +900,23 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
                 
                 x=x+deltaX
                 fondo=datum-x*So
-                           
-                print (str(p),str("{0:.3f}".format(y)),str("{0:.3f}".format(A)),str("{0:.3f}".format(P)),str("{0:.3f}".format(Rh)),str("{0:.3f}".format(v)),str("{0:.3f}".format(E)),str("{0:.3f}".format(Sf)),str("{0:.3f}".format(Sfm)),str("{0:.3f}".format(So_Sfm)),str("{0:.3f}".format(deltaE)),str("{0:.3f}".format(deltaX)),str("{0:.3f}".format(x)),'\n')
+                y_grafica=y+fondo
+                yc_grafica=y_c+fondo
+                
+                if So!=0:
+                    yn_grafica=yn+fondo
+                    linea=str(p)+',' +str("{0:.4f}".format(y))+',' +str("{0:.4f}".format(A))+',' +str("{0:.4f}".format(P))+',' +str("{0:.4f}".format(Rh))+',' +str("{0:.4f}".format(v))+',' +str("{0:.4f}".format(E))+',' +str("{0:.4f}".format(Sf))+',' +str("{0:.4f}".format(Sfm))+',' +str("{0:.4f}".format(So_Sfm))+',' +str("{0:.4f}".format(deltaE))+',' +str("{0:.4f}".format(deltaX))+',' +str("{0:.4f}".format(x))+','+str("{0:.4f}".format(fondo))+','+str("{0:.4f}".format(y_grafica))+','+str("{0:.4f}".format(yc_grafica))+','+str("{0:.4f}".format(yn_grafica))+'\n'
                     
+                else:
+                    linea=str(p)+',' +str("{0:.4f}".format(y))+',' +str("{0:.4f}".format(A))+',' +str("{0:.4f}".format(P))+',' +str("{0:.4f}".format(Rh))+',' +str("{0:.4f}".format(v))+',' +str("{0:.4f}".format(E))+',' +str("{0:.4f}".format(Sf))+',' +str("{0:.4f}".format(Sfm))+',' +str("{0:.4f}".format(So_Sfm))+',' +str("{0:.4f}".format(deltaE))+',' +str("{0:.4f}".format(deltaX))+',' +str("{0:.4f}".format(x))+','+str("{0:.4f}".format(fondo))+','+str("{0:.4f}".format(y_grafica))+','+str("{0:.4f}".format(yc_grafica))+','+'\n'
+                
+                archivoSalida.write(linea)
+                
                     
             else:
-                print (str(p),str("{0:.3f}".format(y)),str("{0:.3f}".format(A)),str("{0:.3f}".format(P)),str("{0:.3f}".format(Rh)),str("{0:.3f}".format(v)),str("{0:.3f}".format(E)),str("{0:.3f}".format(Sf)),'','','','',str(0),'\n')
-           
+                linea=str(p)+',' +str("{0:.4f}".format(y))+',' +str("{0:.4f}".format(A))+',' +str("{0:.4f}".format(P))+',' +str("{0:.4f}".format(Rh))+',' +str("{0:.4f}".format(v))+',' +str("{0:.4f}".format(E))+',' +str("{0:.4f}".format(Sf))+',' +''+',' +''+',' +''+',' +''+',' +str(0) +'\n'
+                archivoSalida.write(linea)
+                
             plot_x.append(float(x))
             plot_fondo.append(float(fondo))
             plot_y.append(float(y+fondo))
@@ -909,3 +930,9 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
             y=y+deltaY
             p=p+1
     print (plot_yn, plot_fondo)
+    
+    archivoSalida.close()
+    
+    return (yn,y_c,tipo)
+
+pasoDirecto(27,0.014,0.02,6.5,2,2,"m",0,1,1.4,20,0,"m3/s","m","m","m","m","m")
