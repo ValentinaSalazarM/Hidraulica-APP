@@ -22,7 +22,8 @@ m2 = 1
 'Gravedad'
 g = 9.81
 
-Figura = 'Trapecial'
+Figura = 'Rectangular'
+Unidades = ''
 y1 = 3.8
 b1 = 16
 b2 = 4
@@ -44,7 +45,36 @@ if Figura == "Trapecial":
         
         m1 = 1
         m2 = 1
+
+def cambio_unidades(unidad,propiedad):
+    
+    """ Esta realiza el cambio de unidades para las propiedades de la figura\n
         
+    Parámetros:
+        unidad (string) Unidad en la que se encuentra para propiedad. 
+        propiedad (float) Valor de la propiedad que se desea cambiar como base, altura del agua, altura de la base del canal.
+    Retorna:
+        float: Retorna la propiedad en metros.
+    """
+    
+    if Unidades == 'mm':
+        
+        temp = propiedad/1000
+    
+    if Unidades == 'cm':
+        
+        temp = propiedad/100
+    
+    if Unidades == 'pulgadas':
+        
+        temp = propiedad/ 39.37
+
+    if Unidades == 'm':
+    
+        temp = propiedad
+        
+    return temp
+
 def Area(y,b,m1,m2):
     
     """ Esta función retorna el área transversal según la figura\n
@@ -90,7 +120,7 @@ def Area(y,b,m1,m2):
 
 def Tfun(y,b,m1,m2):
     
-    """ Esta función retorna el caudal según la sección transversal\n
+    """ Esta función retorna el espejo de agua según la sección transversal\n
         
     Parámetros:
         y (float) altura del agua
@@ -98,7 +128,7 @@ def Tfun(y,b,m1,m2):
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
     Retorna:
-        float: El cuadal de la sección transversal [m^3/s]
+        float: El espejo de agua de la sección transversal [m]
     """
 
     if Figura == "Rectangular":
@@ -148,15 +178,22 @@ def Qfun(y,b,m1,m2):
     return Q
 
 
-def y2fun(y2):
+def y2fun(y1,y2,v1,b1,b2,m1,m2,g):
     
     """ Esta función retorna la altura del agua en la sección dos\n
-        
     Parámetros:
+        y1 (float) altura del agua de la sección 1
         y2 (symbol) variable que se quiere calcular
+        v1 (float) Velocidad de la sección 1
+        b1 (float) base del canal en la sección 1
+        b2 (float) base del canal en la sección 2
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        g (float) Aceleración gravitacional, generalmente 9.81 
     Retorna:
         float: La altura del agua en la sección 2 [m]
     """
+    
     Q = Qfun(y1,b1,m1,m2)
     
     if Figura == "Rectangular":
@@ -214,7 +251,21 @@ def y2fun(y2):
 
 
 
-def calculo_yc(yc):
+def calculo_yc(yc,y1,b1,b2,m1,m2,g):
+    
+    """ Esta función retorna la altura crítica del agua\n
+        
+    Parámetros:
+        yc (symbol) variable que se quiere calcular
+        y1 (float) altura del agua de la sección 1
+        b1 (float) base del canal en la sección 1
+        b2 (float) base del canal en la sección 2
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        g (float) Aceleración gravitacional, generalmente 9.81 
+    Retorna:
+        float: La altura crítica del agua [m]
+    """
     
     Q = Qfun(y1,b1,m1,m2)
     ec1 = Eq(Q/sqrt(g),(Area(yc, b2, m1, m2)*sqrt(Area(yc, b2, m1, m2)))/sqrt(Tfun(yc, b2, m1, m2)))
@@ -225,36 +276,65 @@ def calculo_yc(yc):
 
 
 
-def calculo_v2():
+def calculo_v2(y1,y2,v1,b1,b2,m1,m2,g):
     
+    """ Esta función retorna la velocidad del agua en la sección dos\n     
+    Parámetros:
+        y1 (float) altura del agua de la sección 1
+        y2 (symbol) variable que se quiere calcular
+        v1 (float) Velocidad de la sección 1
+        b1 (float) base del canal en la sección 1
+        b2 (float) base del canal en la sección 2
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        g (float) Aceleración gravitacional, generalmente 9.81 
+    Retorna:
+        float: La velocidad del agua en la sección 2 [m]
+    """
     
-    if y2fun(y2) == "Fenomeno de choque, se requiere calcular yc\n":
-        ecu = Eq(Qfun(y1,b1,m1,m2),v2*Area(calculo_yc(yc),b2,m1,m2))
+    if y2fun(y1,y2,v1,b1,b2,m1,m2,g) == "Fenomeno de choque, se requiere calcular yc\n":
+        ecu = Eq(Qfun(y1,b1,m1,m2),v2*Area(calculo_yc(yc,y1,b1,b2,m1,m2,g),b2,m1,m2))
         v = solve(ecu)
     else:
         if Figura == "Rectangular":
             
-            ecu = Eq(Qfun(y1,b1,m1,m2),v2*Area(y2fun(y2)[2],b2,m1,m2))
+            ecu = Eq(Qfun(y1,b1,m1,m2),v2*Area(y2fun(y1,y2,v1,b1,b2,m1,m2,g)[2],b2,m1,m2))
             v = solve(ecu)
         else:
-            ecu = Eq(Qfun(y1,b1,m1,m2),v2*Area(max(y2fun(y2)),b2,m1,m2))
+            ecu = Eq(Qfun(y1,b1,m1,m2),v2*Area(max(y2fun(y1,y2,v1,b1,b2,m1,m2,g)),b2,m1,m2))
             v = solve(ecu)
     
     return v
 
 
-def calculo_Ec(Ec, yc):
+def calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g):
+
+    """ Esta función retorna la velocidad del agua en la sección dos\n     
+    Parámetros:
+        Ec (symbol) variable que se quiere calcular
+        yc (float) altura critica del agua
+        y1 (float) altura del agua de la sección 1
+        y2 (symbol) variable que se quiere calcular
+        v1 (float) Velocidad de la sección 1
+        b1 (float) base del canal en la sección 1
+        b2 (float) base del canal en la sección 2
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        g (float) Aceleración gravitacional, generalmente 9.81 
+    Retorna:
+        float: La velocidad del agua en la sección 2 [m]
+    """
     
-    ecu = Eq(Ec,calculo_yc(yc) + calculo_v2()[0]**2/(2*g))
+    ecu = Eq(Ec,calculo_yc(yc,y1,b1,b2,m1,m2,g) + calculo_v2(y1,y2,v1,b1,b2,m1,m2,g)[0]**2/(2*g))
     
     Ec = solve(ecu)
     
     return Ec
 
-def calculo_yin(Ec,yin):
+def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g):
     
     Q = Qfun(y1,b1,m1,m2)
-    Ec = calculo_Ec(Ec,yin)[0]
+    Ec = calculo_Ec(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g)[0]
 
     if Figura == "Rectangular":
         
@@ -301,10 +381,10 @@ def calculo_yin(Ec,yin):
     return y
 
 
-def grafica4 (m):
+def grafica4 (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g):
 
     Q = Qfun(y1,b1,m1,m2)
-    EqCri = Eq(m,(0-calculo_yc(yc))/(0-calculo_Ec(Ec,yc)[0]))
+    EqCri = Eq(m,(0-calculo_yc(yc,y1,b1,b2,m1,m2,g))/(0-calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g)[0]))
     m = solve(EqCri)
 
     x = np.linspace(0,10,50)
@@ -331,27 +411,27 @@ def grafica4 (m):
     plt.show()
 
 
-def imprimir_valores():
+def imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g):
     
     msg1 = '\nArea1 '+ str( Area(y1,b1,m1,m2))
     
     msg2 = '\nCaudal '+ str(Qfun(y1,b1,m1,m2))
     
-    msg3 = '\nvalores de y2 '+ str(y2fun(y2))
+    msg3 = '\nvalores de y2 '+ str(y2fun(y1,y2,v1,b1,b2,m1,m2,g))
     
-    msg4 = '\nvalor de yc'+ str(calculo_yc(yc))
+    msg4 = '\nvalor de yc'+ str(calculo_yc(yc,y1,b1,b2,m1,m2,g))
     
-    msg5 = '\nvalor de Ec'+ str(calculo_Ec(Ec, yc))
+    msg5 = '\nvalor de Ec'+ str(calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g))
 
-    msg6 = '\nvelocidad en 2 '+ str(calculo_v2())   
+    msg6 = '\nvelocidad en 2 '+ str(calculo_v2(y1,y2,v1,b1,b2,m1,m2,g))   
     
-    msg7= '\nNuevo y1 '+ str( max(calculo_yin(Ec,yin)))
+    msg7= '\nNuevo y1 '+ str( max(calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g)))
    
-    grafica4(m)
+    grafica4(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g)
     
     return msg1 + msg2 + msg3+ msg4+ msg5+ msg6+ msg7
     
-print(imprimir_valores())
+print(imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g))
 
 
 

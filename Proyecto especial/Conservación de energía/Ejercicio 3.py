@@ -22,11 +22,12 @@ y1,y2 = symbols('y1 y2')
 'Datos de entrada'
 
 Figura = 'Rectangular'
+Unidades = ''
 
-Q = 56.25
-v1 = 1.25
+Q = 96
+v1 = 1.896
 z1 = 0
-z2 = 1.05
+z2 = 2.5
 
 'Variables por default necesarias para las funciones'
 inc= 1
@@ -72,22 +73,111 @@ if Figura == "Trapecial":
 '-----------------------------------------------------------------------------'
 'Funciones para el desarrollo del Ejemplo'
 
-def calculo_dz():
+def cambio_unidades(unidad,propiedad):
+    
+    """ Esta realiza el cambio de unidades para las propiedades de la figura\n
+        
+    Parámetros:
+        unidad (string) Unidad en la que se encuentra para propiedad. 
+        propiedad (float) Valor de la propiedad que se desea cambiar como base, altura del agua, altura de la base del canal.
+    Retorna:
+        float: Retorna la propiedad en metros.
+    """
+    
+    if Unidades == 'mm':
+        
+        temp = propiedad/1000
+    
+    if Unidades == 'cm':
+        
+        temp = propiedad/100
+    
+    if Unidades == 'pulgadas':
+        
+        temp = propiedad/ 39.37
+
+    if Unidades == 'm':
+    
+        temp = propiedad
+        
+    return temp
+
+def Area(y,b,inc,m1,m2):
+    
+    """ Esta función retorna el área transversal según la figura\n
+        
+    Parámetros:
+        y (float) altura del agua
+        b (float) base del canal
+        inc (float) grados o inclinación de la sección triangular
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+    Retorna:
+        float: El área de la sección transversal [m^2]
+    """
+    
+    if Figura == "Rectangular":
+        
+        A = b * y
+        
+    if Figura == "Triangular":
+        
+        if incT == "alpha" or incT == "Alpha":
+            
+            A = y**2/np.tan(inc*np.pi/180)
+            
+        else:
+            
+            A = y**2 * inc
+            
+    if Figura == "Trapecial":
+        
+        
+        if incTraT == "alpha" or incTraT == "Alpha":
+            
+            if m1 == m2:
+                
+                A = y*b+y**2/np.tan(np.pi/180*m1)
+                
+            else:
+                
+                A = y**2/(2*np.tan(np.pi/180*m1)) + b*y + y**2/(2*np.tan(np.pi/180*m2))  
+        else:
+            
+            if m1 == m2:
+                
+                A = (b+m1*y)*y
+                
+            else:
+                
+                A = m1*y**2/2+b*y+m2*y**2/2 
+            
+    return A
+
+def calculo_dz(z1,z2):
     
     """ Esta función retorna el valor de deltaz\n
-    
+    Parametros:
+        z1 (float) Altura del fondo del canal en la sección 1  
+        z2 (float) Altura del fondo del canal en la sección 2
     Retorna:
         float: La diferencia de alturas del fondo del canal[m]
     """
     
     return abs(z1-z2)
     
-def calculo_y1(y1):
+def calculo_y1(y1,Q,v1,b,inc,m1,m2):
     
     """ Esta función retorna el valor de y1\n
         
     Parámetros:
         y1 (symbol) variable que se quiere calcular
+        Q (float) Caudal del canal
+        v1 (float) Velocidad de la sección 1
+        b (float) base del canal
+        inc (float) grados o inclinación de la sección triangular
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
     Retorna:
         float: La altura del agua en la seccion 1 [m]
     """
@@ -173,19 +263,26 @@ def Q_en_litros(Q):
 
 
 
-def y2fun(y1,y2):
+def y2fun(y1,y2,Q,v1,b,inc,m1,m2,z1,z2,g):
     
     """ Esta función retorna la altura del agua en la sección dos\n
         
     Parámetros:
         y1 (symbol) variable que se quiere calcular
         y2 (symbol) variable que se quiere calcular
+        Q (float) Caudal del canal
+        v1 (float) Velocidad de la sección 1
+        b (float) base del canal
+        inc (float) grados o inclinación de la sección triangular
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        g (float) Aceleración gravitacional, generalmente 9.81 
     Retorna:
         float: La altura del agua en la sección 2 [m]
     """
     
-    y1 = calculo_y1(y1)
-    dz = calculo_dz()
+    y1 = calculo_y1(y1,Q,v1,b,inc,m1,m2)
+    dz = calculo_dz(z1,z2)
     
     
     if Figura == "Rectangular":
@@ -246,10 +343,15 @@ def y2fun(y1,y2):
     return y 
 
 
-def grafica3 ():
+def grafica3 (b,inc,m1,m2):
 
     """ Esta función grafica la gráfica de enerigía específica \n
         según la sección transversal
+    Parametros:
+        b (float) base del canal
+        inc (float) grados o inclinación de la sección triangular
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
     Retorna:
         plot: Gráfica de energía específica[m]
     """
@@ -260,7 +362,7 @@ def grafica3 ():
 
     yg = np.linspace(0.2,10,300) 
     
-    Ei = yg + (Q**2/(2*g*(Area(yg,inc,m1,m2))**2))
+    Ei = yg + (Q**2/(2*g*(Area(yg,b,inc,m1,m2))**2))
 
     plt.style.use('classic')
     plt.plot(Ei,yg,label = 'S8')
@@ -279,8 +381,8 @@ def imprimir_valores():
         plot: Gráfica de energía específica
         str: Mensaje con los valores de caudal y área
     """
-    yf = y2fun(y1,y2)
-    grafica3()
+    yf = y2fun(y1,y2,Q,v1,b,inc,m1,m2,z1,z2,g)
+    grafica3(b,inc,m1,m2)
     i=0
     y =[]
     
@@ -289,7 +391,7 @@ def imprimir_valores():
         y.append(str(round(yf[i],3)) + ' [m]')
         i+=1
         
-    msg1 = '\nLa altura inicial del agua (y1) es: '+str(calculo_y1(y1))+' [m]'
+    msg1 = '\nLa altura inicial del agua (y1) es: '+str(calculo_y1(y1,Q,v1,b,inc,m1,m2))+' [m]'
     msg2 = '\nEl cuada es:'+str(round(Q_en_litros(Q),4))+ ' [l/s]'
     msg3 = '\nLos valores de y2 son: '+ str(y)
     
@@ -298,7 +400,7 @@ def imprimir_valores():
     else:
         msg4 = '\nLa altura final del agua (y2) es: '+str(y[2])
         
-    msg5 = '\nEl valor de delta z es: '+str(round(calculo_dz(),2))+' [m]'
+    msg5 = '\nEl valor de delta z es: '+str(round(calculo_dz(z1,z2),2))+' [m]'
     
     msg = msg1 + msg2 +msg3 +msg4 +msg5
     

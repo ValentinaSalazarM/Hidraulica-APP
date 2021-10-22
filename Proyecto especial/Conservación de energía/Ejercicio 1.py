@@ -20,7 +20,8 @@ v2 = symbols('v2')
 '------------------------------------------------------------------------------'
 'Datos de entrada'
 
-Figura = 'Trapecial'
+Figura = 'Rectangular'
+Unidades = ''
 
 y1 = 15
 y2 = 3
@@ -66,6 +67,36 @@ if Figura == "Trapecial":
         m2 = 1
       
 '------------------------------------------------------------------------------'
+
+def cambio_unidades(unidad,propiedad):
+    
+    """ Esta realiza el cambio de unidades para las propiedades de la figura\n
+        
+    Parámetros:
+        unidad (string) Unidad en la que se encuentra para propiedad. 
+        propiedad (float) Valor de la propiedad que se desea cambiar como base, altura del agua, altura de la base del canal.
+    Retorna:
+        float: Retorna la propiedad en metros.
+    """
+    
+    if Unidades == 'mm':
+        
+        temp = propiedad/1000
+    
+    if Unidades == 'cm':
+        
+        temp = propiedad/100
+    
+    if Unidades == 'pulgadas':
+        
+        temp = propiedad/ 39.37
+
+    if Unidades == 'm':
+    
+        temp = propiedad
+        
+    return temp
+
 
 def Areas(y1,y2,b,inc,m1,m2):
     
@@ -126,15 +157,19 @@ def Areas(y1,y2,b,inc,m1,m2):
             
     return A1,A2
 
-def CaudalSalidafun(y1,y2,v1,v2):
+def CaudalSalidafun(y1,y2,v2,b,inc,m1,m2,g):
     
     """Esta función retorna el caudal\n
     
     Parametros:
         y1 (float) altura de la sección 1 
-        y2 (float) altura de la sección 2 
-        v1 (float) velocidad de la sección 1
+        y2 (float) altura de la sección 2
         v2 (Symbol) velocidad de las sección dos para realizar el cálculo
+        b (float) base del canal
+        inc (int) inclinacion del triangulo
+        m1 (int) pendiente del lado izquierdo del canal 
+        m2 (int) pendiente de lado derecho del canal
+        g (float) Aceleración gravitacional, generalmente 9.81
     Retorna:
         float: El caudal [m^3/s]
     """
@@ -229,7 +264,7 @@ def imprimir_valores():
     
     msg1 = '\nEl área transversal 1 [m^2] es: '+str(round(Areas(y1,y2,b,inc,m1,m2)[0],3)) 
     msg2 = '\nEl área transversal 2 [m^2] es: '+str(round(Areas(y1,y2,b,inc,m1,m2)[1],3)) 
-    msg3 = '\nEl cuadal [l/s] es: '+str(round(CaudalSalidafun(y1,y2,v1,v2)*1000,4)) 
+    msg3 = '\nEl cuadal [l/s] es: '+str(round(CaudalSalidafun(y1,y2,v2,b,inc,m1,m2,g)*1000,4)) 
     
     temp = msg1 + msg2 +msg3 
     return temp
