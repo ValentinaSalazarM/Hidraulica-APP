@@ -19,11 +19,8 @@ y2, y = symbols('y2 y')
 
 'Elevación del fondo del canal'
 
-
 'Datos de entrada'
 
-Figura = 'Rectangular'
-Unidades = ''
 
 y1 = 4.5
 v1 = 1.25
@@ -38,39 +35,6 @@ m2 = 1
 'Gravedad'
 g = 9.81
 
-
-'Datos adicionales dependiente del tipo de figura'
-
-if Figura == "Rectangular":
-    
-    b = 10
-
-if Figura == "Triangular":
-    
-    incT = 'alpha'
-    
-    if incT == "alpha" or incT == "Alpha":
-        
-        inc = 45
-    else:
-        
-        inc = 1
-        
-if Figura == "Trapecial":
-    
-    b = 10
-    incTraT = 'alpha'
-    
-    if incTraT == "alpha" or incTraT == "Alpha":
-        
-        m1 = 45
-        m2 = 45
-        
-    else:
-        
-        m1 = 1
-        m2 = 1
-        
 'Funciones para el desarrollo'
 
 def cambio_unidades(unidad,propiedad):
@@ -84,20 +48,40 @@ def cambio_unidades(unidad,propiedad):
         float: Retorna la propiedad en metros.
     """
     
-    if Unidades == 'mm':
+    if unidad == 'mm':
         
         temp = propiedad/1000
     
-    if Unidades == 'cm':
+    if unidad == 'cm':
         
         temp = propiedad/100
     
-    if Unidades == 'pulgadas':
+    if unidad == 'in':
         
         temp = propiedad/ 39.37
 
-    if Unidades == 'm':
+    if unidad == 'm':
     
+        temp = propiedad
+        
+    return temp
+
+def cambio_angulo(unidad,propiedad):
+    
+    """ Esta realiza el cambio del angulo\n
+        
+    Parámetros:
+        unidad (string) Puede ser grados o pendiente. 
+        propiedad (float) Valor del angulo.
+    Retorna:
+        float: Retorna el angulo en pendiente (m).
+    """
+    
+    if unidad == 'grados':
+        
+        temp = 1/np.tan(np.pi/180*propiedad)
+    
+    else:
         temp = propiedad
         
     return temp
@@ -109,49 +93,31 @@ def Area(b,y,inc,m1,m2):
     Parámetros:
         b (float) base del canal
         y (float) altura del agua
-        inc (float) grados o inclinación de la sección triangular
-        m1 (float) grados o inclinación parte izquierda de un trapecio
-        m2 (float) grados o inclinación parte derecha de un trapecio
+        inc (float) Pendiente de la sección triangular
+        m1 (float) Pendiente parte izquierda de un trapecio
+        m2 (float) Pendiente parte derecha de un trapecio
     Retorna:
         float: El área de la sección transversal [m^2]
     """
     
-    if Figura == "Rectangular":
+    if inc == 0 and m1 == 0 and m2 == 0:
         
         A = b * y
         
-    if Figura == "Triangular":
+    if b == 0:
         
-        if incT == "alpha" or incT == "Alpha":
+        A = y**2 * inc
             
-            A = y**2/np.tan(inc*np.pi/180)
-            
+    else:
+        
+        if m1 == m2:
+                
+            A = (b+m1*y)*y
+                
         else:
             
-            A = y**2 * inc
-            
-    if Figura == "Trapecial":
+            A = m1*y**2/2+b*y+m2*y**2/2 
         
-        
-        if incTraT == "alpha" or incTraT == "Alpha":
-            
-            if m1 == m2:
-                
-                A = y*b+y**2/np.tan(np.pi/180*m1)
-                
-            else:
-                
-                A = y**2/(2*np.tan(np.pi/180*m1)) + b*y + y**2/(2*np.tan(np.pi/180*m2))  
-        else:
-            
-            if m1 == m2:
-                
-                A = (b+m1*y)*y
-                
-            else:
-                
-                A = m1*y**2/2+b*y+m2*y**2/2 
-            
     return A
 
 
@@ -163,9 +129,9 @@ def Qfun(b,y,inc,m1,m2):
     Parámetros:
         b (float) base del canal
         y (float) altura del agua
-        inc (float) grados o inclinación de la sección triangular
-        m1 (float) grados o inclinación parte izquierda de un trapecio
-        m2 (float) grados o inclinación parte derecha de un trapecio
+        inc (float) Pendiente de la sección triangular
+        m1 (float) Pendiente parte izquierda de un trapecio
+        m2 (float) Pendiente parte derecha de un trapecio
     Retorna:
         float: El cuadal de la sección transversal [m^3/s]
     """
@@ -198,9 +164,9 @@ def y2fun(y2,b,y1,inc,m1,m2,v1,z1,z2,g):
         y2 (symbol) variable que se quiere calcular
         b (float) base del canal
         y1 (float) altura del agua en la sección 1
-        inc (float) grados o inclinación de la sección triangular
-        m1 (float) grados o inclinación parte izquierda de un trapecio
-        m2 (float) grados o inclinación parte derecha de un trapecio
+        inc (float) Pendiente de la sección triangular
+        m1 (float) Pendiente parte izquierda de un trapecio
+        m2 (float) Pendiente parte derecha de un trapecio
         v1 (float) velocidad de la sección 1 del canal
         z1 (float) Altura del fondo del canal en la sección 1  
         z2 (float) Altura del fondo del canal en la sección 2
@@ -209,52 +175,30 @@ def y2fun(y2,b,y1,inc,m1,m2,v1,z1,z2,g):
         float: La altura del agua en la sección 2 [m]
     """
     
-    if Figura == "Rectangular":
+    if inc == 0 and m1 == 0 and m2 == 0:
         
         ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*(b*y2)**2))+z2)
     
         y2 = solve(ec1)
     
-    if Figura == "Triangular":
+    if b == 0:
         
-        if incT == "alpha" or incT == "Alpha":
-            
-            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*(y2**2/np.tan(np.pi/180*inc))**2))+z2)
+        ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*(y2**2*inc)**2))+z2)
+    
+        y2 = solve(ec1)       
+    
+    else:
+        
+        if m1 == m2:
+                
+            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*((b+m1*y2)*y2)**2))+z2)
     
             y2 = solve(ec1)
-            
+                
         else:
-            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*(y2**2*inc)**2))+z2)
-    
-            y2 = solve(ec1)       
-    
-    if Figura == "Trapecial":
-        
-        if incTraT == "alpha" or incTraT == "Alpha":
+            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*(m1*y2**2/2+b*y2+m2*y2**2/2)**2))+z2)
             
-            if m1 == m2:
-                
-                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*(y2*b+y2**2/np.tan(np.pi/180*m1))**2))+z2)
-    
-                y2 = solve(ec1)
-                
-            else:
-                
-                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*(y2**2/(2*np.tan(np.pi/180*m1)) + b*y2 + y2**2/(2*np.tan(np.pi/180*m2)))**2))+z2)
-    
-                y2 = solve(ec1) 
-        else:
-            
-            if m1 == m2:
-                
-                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*((b+m1*y2)*y2)**2))+z2)
-    
-                y2 = solve(ec1)
-                
-            else:
-                ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,inc,m1,m2)**2)/(2*g*(m1*y2**2/2+b*y2+m2*y2**2/2)**2))+z2)
-            
-                y2 = solve(ec1)
+            y2 = solve(ec1)
     
     return y2 
 
@@ -265,9 +209,9 @@ def grafica2 (b,y1,inc,m1,m2):
     Parametros:
         b (float) base del canal
         y1 (float) altura del agua
-        inc (float) grados o inclinación de la sección triangular
-        m1 (float) grados o inclinación parte izquierda de un trapecio
-        m2 (float) grados o inclinación parte derecha de un trapecio
+        inc (float) Pendiente de la sección triangular
+        m1 (float) Pendiente parte izquierda de un trapecio
+        m2 (float) Pendiente parte derecha de un trapecio
     Retorna:
         plot: Gráfica de energía específica[m]
     """

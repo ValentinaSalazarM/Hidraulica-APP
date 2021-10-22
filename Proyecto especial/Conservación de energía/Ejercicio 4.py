@@ -16,35 +16,18 @@ yin, m, yc, Ec, y2, v2= symbols('yin m yc Ec y2 v2')
 
 'Variables por default necesarias para las funciones'
 
-m1 = 1
-m2 = 1
+m1 = 0
+m2 = 0
 
 'Gravedad'
 g = 9.81
 
-Figura = 'Rectangular'
-Unidades = ''
 y1 = 3.8
 b1 = 16
 b2 = 4
 v1 = 1.05
 
 '-----------------------------------------------------------------------------'
-'Datos adicionales dependiente del tipo de sección'
-
-if Figura == "Trapecial":
-    
-    incTraT = 'alpha'
-    
-    if incTraT == "alpha" or incTraT == "Alpha":
-        
-        m1 = 45
-        m2 = 45
-        
-    else:
-        
-        m1 = 1
-        m2 = 1
 
 def cambio_unidades(unidad,propiedad):
     
@@ -57,20 +40,40 @@ def cambio_unidades(unidad,propiedad):
         float: Retorna la propiedad en metros.
     """
     
-    if Unidades == 'mm':
+    if unidad == 'mm':
         
         temp = propiedad/1000
     
-    if Unidades == 'cm':
+    if unidad == 'cm':
         
         temp = propiedad/100
     
-    if Unidades == 'pulgadas':
+    if unidad == 'in':
         
         temp = propiedad/ 39.37
 
-    if Unidades == 'm':
+    if unidad == 'm':
     
+        temp = propiedad
+        
+    return temp
+
+def cambio_angulo(unidad,propiedad):
+    
+    """ Esta realiza el cambio del angulo\n
+        
+    Parámetros:
+        unidad (string) Puede ser grados o pendiente. 
+        propiedad (float) Valor del angulo.
+    Retorna:
+        float: Retorna el angulo en pendiente (m).
+    """
+    
+    if unidad == 'grados':
+        
+        temp = 1/np.tan(np.pi/180*propiedad)
+    
+    else:
         temp = propiedad
         
     return temp
@@ -88,31 +91,20 @@ def Area(y,b,m1,m2):
         float: El área de la sección transversal [m^2]
     """
     
-    if Figura == "Rectangular":
+    if m1 == 0 and m2 == 0:
         
         A = b * y
             
-    if Figura == "Trapecial":
+    if b!= 0 and m1 != 0 and m2 != 0:
         
         
-        if incTraT == "alpha" or incTraT == "Alpha":
-            
-            if m1 == m2:
+        if m1 == m2:
                 
-                A = y*b+y**2/np.tan(np.pi/180*m1)
+            A = (b+m1*y)*y
                 
-            else:
-                
-                A = y**2/(2*np.tan(np.pi/180*m1)) + b*y + y**2/(2*np.tan(np.pi/180*m2))  
         else:
-            
-            if m1 == m2:
                 
-                A = (b+m1*y)*y
-                
-            else:
-                
-                A = m1*y**2/2+b*y+m2*y**2/2 
+            A = m1*y**2/2+b*y+m2*y**2/2 
             
     return A
 
@@ -131,31 +123,20 @@ def Tfun(y,b,m1,m2):
         float: El espejo de agua de la sección transversal [m]
     """
 
-    if Figura == "Rectangular":
+    if m1 == 0 and m2 == 0:
         
         T = b
 
-    if Figura == "Trapecial":
+    if b!= 0 and m1 != 0 and m2 != 0:
         
         
-        if incTraT == "alpha" or incTraT == "Alpha":
-            
-            if m1 == m2:
+        if m1 == m2:
                 
-                T = b + 2 * (y/np.tan(np.pi/180*m1))
+            T = b + 2 * (m1*y)
                 
-            else:
-                
-                T = b + (y/np.tan(np.pi/180*m1)) + (y/np.tan(np.pi/180*m2))
         else:
-            
-            if m1 == m2:
                 
-                T = b + 2 * (m1*y)
-                
-            else:
-                
-                T = b + (m1*y) + (m2*y)
+            T = b + (m1*y) + (m2*y)
 
     return T
     
@@ -196,39 +177,24 @@ def y2fun(y1,y2,v1,b1,b2,m1,m2,g):
     
     Q = Qfun(y1,b1,m1,m2)
     
-    if Figura == "Rectangular":
+    if m1 == 0 and m2 == 0:
         
         ec1 = Eq(y1+((v1**2)/(2*g)),y2+((Q**2)/(2*g*(b2*y2)**2)))
     
         y2 = solve(ec1)  
     
-    if Figura == "Trapecial":
+    if b!= 0 and m1 != 0 and m2 != 0:
         
-        if incTraT == "alpha" or incTraT == "Alpha":
-            
-            if m1 == m2:
+        if m1 == m2:
                 
-                ec1 = Eq(y1+((v1**2)/(2*g)),y2+((Q**2)/(2*g*(y2*b2+y2**2/np.tan(np.pi/180*m1))**2)))
+            ec1 = Eq(y1+((v1**2)/(2*g)),y2+((Q**2)/(2*g*((b2+m1*y2)*y2)**2)))
     
-                y2 = solve(ec1)
+            y2 = solve(ec1)
                 
-            else:
-                
-                ec1 = Eq(y1+((v1**2)/(2*g)),y2+((Q**2)/(2*g*(y2**2/(2*np.tan(np.pi/180*m1)) + b2*y2 + y2**2/(2*np.tan(np.pi/180*m2)))**2)))
-    
-                y2 = solve(ec1) 
         else:
-            
-            if m1 == m2:
-                
-                ec1 = Eq(y1+((v1**2)/(2*g)),y2+((Q**2)/(2*g*((b2+m1*y2)*y2)**2)))
-    
-                y2 = solve(ec1)
-                
-            else:
-                ec1 = Eq(y1+((v1**2)/(2*g)),y2+((Q**2)/(2*g*(m1*y2**2/2+b2*y2+m2*y2**2/2)**2)))
-            
-                y2 = solve(ec1)
+            ec1 = Eq(y1+((v1**2)/(2*g)),y2+((Q**2)/(2*g*(m1*y2**2/2+b2*y2+m2*y2**2/2)**2)))
+        
+            y2 = solve(ec1)
     
     i=0
     y =[]
@@ -296,11 +262,12 @@ def calculo_v2(y1,y2,v1,b1,b2,m1,m2,g):
         ecu = Eq(Qfun(y1,b1,m1,m2),v2*Area(calculo_yc(yc,y1,b1,b2,m1,m2,g),b2,m1,m2))
         v = solve(ecu)
     else:
-        if Figura == "Rectangular":
+        if m1 == 0 and m2 == 0:
             
             ecu = Eq(Qfun(y1,b1,m1,m2),v2*Area(y2fun(y1,y2,v1,b1,b2,m1,m2,g)[2],b2,m1,m2))
             v = solve(ecu)
-        else:
+            
+        if b!= 0 and m1 != 0 and m2 != 0:
             ecu = Eq(Qfun(y1,b1,m1,m2),v2*Area(max(y2fun(y1,y2,v1,b1,b2,m1,m2,g)),b2,m1,m2))
             v = solve(ecu)
     
@@ -336,39 +303,24 @@ def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g):
     Q = Qfun(y1,b1,m1,m2)
     Ec = calculo_Ec(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g)[0]
 
-    if Figura == "Rectangular":
+    if m1 == 0 and m2 == 0:
         
         ec1 = Eq(Ec,yin+((Q**2)/(2*g*(b1*yin)**2)))
     
         yin = solve(ec1)  
     
-    if Figura == "Trapecial":
+    if b == 0 and m1 != 0 and m2 != 0:
         
-        if incTraT == "alpha" or incTraT == "Alpha":
-            
-            if m1 == m2:
+        if m1 == m2:
                 
-                ec1 = Eq(Ec,yin+((Q**2)/(2*g*(yin*b1+yin**2/np.tan(np.pi/180*m1))**2)))
+            ec1 = Eq(Ec,yin+((Q**2)/(2*g*((b1+m1*yin)*yin)**2)))
     
-                yin = solve(ec1)
+            yin = solve(ec1)
                 
-            else:
-                
-                ec1 = Eq(Ec,yin+((Q**2)/(2*g*(yin**2/(2*np.tan(np.pi/180*m1)) + b1*yin + yin**2/(2*np.tan(np.pi/180*m2)))**2)))
-    
-                yin = solve(ec1) 
         else:
-            
-            if m1 == m2:
-                
-                ec1 = Eq(Ec,yin+((Q**2)/(2*g*((b1+m1*yin)*yin)**2)))
-    
-                yin = solve(ec1)
-                
-            else:
-                ec1 = Eq(Eq,yin+((Q**2)/(2*g*(m1*yin**2/2+b1*yin+m2*yin**2/2)**2)))
-            
-                yin = solve(ec1)
+            ec1 = Eq(Eq,yin+((Q**2)/(2*g*(m1*yin**2/2+b1*yin+m2*yin**2/2)**2)))
+        
+            yin = solve(ec1)
     i=0
     y =[]
     
@@ -400,7 +352,7 @@ def grafica4 (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g):
     plt.plot(E,yg,label = 'S1')
     plt.plot(E2,yg,label = 'S2')
     plt.plot(x,x, label = 'E = y',linestyle='dashed')
-    if Figura == "Rectangular":
+    if m1 != 0 and m2 != 0:
         plt.plot(x,m*x,label = 'Ec = 3/2 yc', linestyle='dashed')
         
     plt.xlabel('E (m)')
