@@ -950,7 +950,7 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     return (plot_i, plot_yi, plot_A, plot_P, plot_R, plot_v, plot_E, plot_Sfi, plot_sfm, plot_So_Sfm, plot_deltaE, plot_deltaX, plot_x, plot_fondo, plot_y, plot_yc, plot_yn)
 
 def txt_pasoDirecto(plot_i, plot_yi, plot_A, plot_P, plot_R, plot_v, plot_E, plot_Sfi, plot_sfm, plot_So_Sfm, plot_deltaE, plot_deltaX, plot_x, plot_fondo, plot_y, plot_yc, plot_yn, ruta):
-    """Calcula el perfil de un flujo gradualmente variado a partir de una aproximación de diferencias finitas. Distancia entre dos profundidades conocidas\n
+    """Exporta archivo txt con resultados del paso directo\n
     plot_i = iteracion
     plot_yi = y(m)
     plot_A = A(m2)
@@ -996,6 +996,15 @@ def txt_pasoDirecto(plot_i, plot_yi, plot_A, plot_P, plot_R, plot_v, plot_E, plo
     file.close()
     
 def grafica_pasoDirecto(plot_x,plot_fondo,plot_y,plot_yc,plot_yn,ruta):
+    """Grafica resultados de paso directo
+    plot_x = x(m)
+    plot_fondo = Fondo(m)
+    plot_y = Altura(m)
+    plot_yc = yc(m)
+    plot_yn = yn(m) 
+    """
+    
+    
     plt.plot(plot_x,plot_fondo, color = '#804000', label = 'Fondo')
     plt.plot(plot_x,plot_y, color = '#4472C4', label = 'Altura')
     plt.plot(plot_x,plot_yc, color = '#FF0000', label = 'yc')
