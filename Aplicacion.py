@@ -826,12 +826,8 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     uy2 = unidades de uy2 (mm, cm, m, in)<br />"""
     
 
-    nombreArchivo='./Excel paso directo.csv'
+    nombreArchivo='./Excel paso directo.txt'
 
-        
-    archivoSalida = open(nombreArchivo, 'w')
-    archivoSalida.write('Iteracion,y(m),A(m2),P(m),R(m),v(m/s),E(m),Sfi,Sfm,So-Sfm,deltaE(m),deltaX(m),x(m),Fondo (m), Profundidad (m), yc(m),yn(m)\n')
-    
     
     
     b=CU_m(b,ub)
@@ -847,12 +843,23 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     m1=math.tan(math.radians(m1))
     m2=math.tan(math.radians(m2))
     
-    
+    plot_i=[]
+    plot_yi=[]
+    plot_A=[]
+    plot_P=[]
+    plot_R=[]
+    plot_v=[]
+    plot_E=[]
+    plot_Sfi=[]
+    plot_sfm=[]
+    plot_So_Sfm=[]
+    plot_deltaE=[]
+    plot_deltaX=[]
     plot_x=[]
-    plot_yc=[]
-    plot_yn=[]
     plot_fondo=[]
     plot_y=[]
+    plot_yc=[]
+    plot_yn=[]
     
     
     deltaY=(y_obj-y_control)/pasos
@@ -892,6 +899,17 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
             v=Q/A
             E=y+v**2/(2*9.81)
             Sf= Q**2*n**2*P**(4/3)/(A**(10/3))
+            
+            
+            plot_i.append(float(p))
+            plot_yi.append(float(y))
+            plot_A.append(float(A))
+            plot_P.append(float(P))
+            plot_R.append(float(Rh))
+            plot_v.append(float(v))
+            plot_E.append(float(E))
+            plot_Sfi.append(float(Sf))
+
             if p>0:
                 Sfm=(Sf+Sfi)/2
                 So_Sfm=So-Sfm
@@ -900,39 +918,81 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
                 
                 x=x+deltaX
                 fondo=datum-x*So
-                y_grafica=y+fondo
-                yc_grafica=y_c+fondo
                 
-                if So!=0:
-                    yn_grafica=yn+fondo
-                    linea=str(p)+',' +str("{0:.4f}".format(y))+',' +str("{0:.4f}".format(A))+',' +str("{0:.4f}".format(P))+',' +str("{0:.4f}".format(Rh))+',' +str("{0:.4f}".format(v))+',' +str("{0:.4f}".format(E))+',' +str("{0:.4f}".format(Sf))+',' +str("{0:.4f}".format(Sfm))+',' +str("{0:.4f}".format(So_Sfm))+',' +str("{0:.4f}".format(deltaE))+',' +str("{0:.4f}".format(deltaX))+',' +str("{0:.4f}".format(x))+','+str("{0:.4f}".format(fondo))+','+str("{0:.4f}".format(y_grafica))+','+str("{0:.4f}".format(yc_grafica))+','+str("{0:.4f}".format(yn_grafica))+'\n'
-                    
-                else:
-                    linea=str(p)+',' +str("{0:.4f}".format(y))+',' +str("{0:.4f}".format(A))+',' +str("{0:.4f}".format(P))+',' +str("{0:.4f}".format(Rh))+',' +str("{0:.4f}".format(v))+',' +str("{0:.4f}".format(E))+',' +str("{0:.4f}".format(Sf))+',' +str("{0:.4f}".format(Sfm))+',' +str("{0:.4f}".format(So_Sfm))+',' +str("{0:.4f}".format(deltaE))+',' +str("{0:.4f}".format(deltaX))+',' +str("{0:.4f}".format(x))+','+str("{0:.4f}".format(fondo))+','+str("{0:.4f}".format(y_grafica))+','+str("{0:.4f}".format(yc_grafica))+','+'\n'
                 
-                archivoSalida.write(linea)
+                plot_sfm.append(float(Sfm))
+                plot_So_Sfm.append(float(So_Sfm))
+                plot_deltaE.append(float(deltaE))
+                plot_deltaX.append(float(deltaX))
+                plot_x.append(float(x))
                 
-                    
+                
+     
             else:
-                linea=str(p)+',' +str("{0:.4f}".format(y))+',' +str("{0:.4f}".format(A))+',' +str("{0:.4f}".format(P))+',' +str("{0:.4f}".format(Rh))+',' +str("{0:.4f}".format(v))+',' +str("{0:.4f}".format(E))+',' +str("{0:.4f}".format(Sf))+',' +''+',' +''+',' +''+',' +''+',' +str(0) +'\n'
-                archivoSalida.write(linea)
+                plot_sfm.append(0)
+                plot_So_Sfm.append(0)
+                plot_deltaE.append(0)
+                plot_deltaX.append(0)
+                plot_x.append(0)
                 
-            plot_x.append(float(x))
-            plot_fondo.append(float(fondo))
-            plot_y.append(float(y+fondo))
-            plot_yc.append(float(y_c+fondo))
             if So!=0:
-                plot_yn.append(float(yn+fondo))
+                yn_grafica=yn+fondo
+                plot_yn.append(float(yn_grafica))
+            else:
+                plot_yn.append(0)
                 
-           
+            y_grafica=y+fondo
+            yc_grafica=y_c+fondo
+            plot_y.append(float(y_grafica))
+            plot_yc.append(float(yc_grafica))
+            plot_fondo.append(float(fondo))
             Sfi=Sf
             Ei=E
             y=y+deltaY
             p=p+1
-    print (plot_yn, plot_fondo)
     
-    archivoSalida.close()
+    
+    plt.plot(plot_x,plot_fondo, color = '#804000', label = 'Fondo')
+    plt.plot(plot_x,plot_y, color = '#4472C4', label = 'Altura')
+    plt.plot(plot_x,plot_yc, color = '#FF0000', label = 'yc')
+    plt.plot(plot_x,plot_yn, color = '#70AD47', label = 'yn')
+    plt.xlabel('x')
+    plt.ylabel('Altura')
+    titulo = 'Perfil de flujo (m)'
+    plt.title(titulo)
+    plt.rcParams["figure.figsize"] = (25,10)
+    plt.grid()
+    plt.legend()
+    #plt.savefig(rutaGrafica)
+    plt.show() 
+    
+    
+    plot_i.insert(0,"iteracion")
+    plot_yi.insert(0,"y(m)")
+    plot_A.insert(0,"A(m2)")
+    plot_P.insert(0,"P(m)")
+    plot_R.insert(0,"R(m)")
+    plot_v.insert(0,"v(m/s)")
+    plot_E.insert(0,"E(m)")
+    plot_Sfi.insert(0,"Sfi")
+    plot_sfm.insert(0,"Sfm")
+    plot_So_Sfm.insert(0,"So-Sfm")
+    plot_deltaE.insert(0,"deltaE(m)")
+    plot_deltaX.insert(0,"deltaX(m)")
+    plot_x.insert(0,"x(m)")
+    plot_fondo.insert(0,"Fondo(m)")
+    plot_y.insert(0,"Altura(m)")
+    plot_yc.insert(0,"yc(m)")
+    plot_yn.insert(0,"yn(m)")
+    
+    
+    file = open(nombreArchivo, 'w')
+   
+    for index in range(len(plot_i)):
+        file.write(str(plot_i[index]) + "\t" + str(plot_yi[index]) + "\t" + str(plot_A[index]) + "\t" + str(plot_P[index]) + "\t" + str(plot_R[index]) + "\t" + str(plot_v[index]) + "\t" + str(plot_E[index]) + "\t" + str(plot_Sfi[index]) + "\t" + str(plot_sfm[index]) + "\t" + str(plot_So_Sfm[index]) + "\t" + str(plot_deltaE[index]) + "\t" + str(plot_deltaX[index]) + "\t" + str(plot_x[index]) + "\t" + str(plot_fondo[index]) + "\t" + str(plot_y[index]) + "\t" + str(plot_yc[index]) + "\t" + str(plot_yn[index]) + "\n")
+    file.close()
+    
     
     return (yn,y_c,tipo)
 
-pasoDirecto(27,0.014,0.02,6.5,2,2,"m",0,1,1.4,20,0,"m3/s","m","m","m","m","m")
+#pasoDirecto(27,0.014,0.02,6.5,2,2,"m",0,1,1.4,20,0,"m3/s","m","m","m","m","m")
