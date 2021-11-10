@@ -126,9 +126,9 @@ while centinela1 == False:
     
     R = Rafun(Ryd,di)
     
-    v = velofun(Ryd,d,So,ks,vi,g)
+    v = velofun(Ryd,di,So,ks,vi,g)
     
-    Q = Caufun(Ryd,d,So,ks,vi,g)
+    Q = Caufun(Ryd,di,So,ks,vi,g)
     
     if Q > Qd:
         
@@ -157,9 +157,9 @@ while centinela2 == False:
     
     R = Rafun(A,P)
     
-    v = velofun(R,So,ks,vi)
+    v = velofun(Ryd,di,So,ks,vi,g)
     
-    Q = Caufun(Ryd,d,So,ks,vi,g)
+    Q = Caufun(Ryd,di,So,ks,vi,g)
     
     if Q > Qd: 
         
@@ -183,9 +183,9 @@ while centinela2 == False:
 
 
 
-print(round(Q,4), Qd, round(y,4), di, round(Fr(v,D),4), round(tao(R,So),4), Ryd)
+print(round(Q,4), Qd, round(y,4), di, round(Fr(Ryd,di,So,ks,vi,g),4), round(tao(Ryd,di,So),4), Ryd)
 
-if abs((Fr(v,D)-1.1)/1.1)<0.01:
+if abs((Fr(Ryd,di,So,ks,vi,g)-1.1)/1.1)<0.01:
     
     
     if Ryd <=70:
