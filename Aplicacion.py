@@ -12,6 +12,7 @@ import math
 import sys
 import unidecode
 import scipy.integrate as integrate
+import os
 
 '-----------------------------------------------------------------------------'
 'Funciones para cambio de unidades'
@@ -755,16 +756,15 @@ def funcionIntegral_rectangular(y,Q,n,So,b,m1,m2):
     A = b*y+(m1*y**2)/2+(m2*y**2)/2
     P=b+y*np.sqrt(m1**2+1)+y*np.sqrt(m2**2+1)
     T=b+m1*y+m2*y
-    f = f=((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
+    f =((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
     return f
 
 def funcionIntegral_circular(y,Q,n,So,d):
     theta = np.pi+2*np.arcsin((y-(d/2))/(d/2))
     A= (theta-np.sin(theta))*d**2/8
     P= theta*d/2
-    T=2*np.sqrt(y*(d-y))
-    
-    f=((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
+    T=d*np.cos(np.arcsin((y-(d/2))/(d/2)))
+    f =((1-(Q**2*(T))/(9.81*(A)**3))/(So-((n**2*Q**2*(P)**(4/3))/((A)**(10/3)))))
     return f
 
 def fgv_int(Q,n,So,b,m1,m2,um,d,y1,y2,uQ,uSo,ub,ud,uy1,uy2):
@@ -824,6 +824,7 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     ud = unidades de d (mm, cm, m, in)<br />
     uy1 = unidades de uy1 (mm, cm, m, in)<br />
     uy2 = unidades de uy2 (mm, cm, m, in)<br />"""
+        
     
     b=CU_m(b,ub)
     d=CU_m(d,ud)
@@ -838,14 +839,23 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     m1=math.tan(math.radians(m1))
     m2=math.tan(math.radians(m2))
     
-    
+    plot_i=[]
+    plot_yi=[]
+    plot_A=[]
+    plot_P=[]
+    plot_R=[]
+    plot_v=[]
+    plot_E=[]
+    plot_Sfi=[]
+    plot_sfm=[]
+    plot_So_Sfm=[]
+    plot_deltaE=[]
+    plot_deltaX=[]
     plot_x=[]
-    plot_yc=[]
-    plot_yn=[]
     plot_fondo=[]
     plot_y=[]
-    
-    
+    plot_yc=[]
+    plot_yn=[]
     
     
     deltaY=(y_obj-y_control)/pasos
@@ -854,19 +864,23 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
     
     if So!=0:
         yn=yn_manning(Q,n,So,m1,m2,"m",b,d,"si","m","m","m","m")
+    else:
+        yn=0
+        
     
-    Sc=pendienteC_limite(n,Q,b,m1,m2,"m",d,"m","m","m")
+    y_c,v_c,Sc=pendienteC_limite(n,Q,b,m1,m2,"m",d,"m","m","m")
     
-    if So<Sc:
-        print ('suave')
-    elif So>Sc:
-        print ('empinada')
-    elif So==Sc:
-        print ('crítica')
-    elif So==0:
-        print ('horizontal')
-    elif So<0:
-        print ('adversa')
+    
+    # if So<Sc:
+    #     tipo='suave'
+    # elif So>Sc:
+    #     tipo='empinada'
+    # elif So==Sc:
+    #     tipo='crítica'
+    # elif So==0:
+    #     tipo= 'horizontal'
+    # elif So<0:
+    #     tipo='adversa'
     
     p=0
     y=y_control
@@ -881,6 +895,17 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
             v=Q/A
             E=y+v**2/(2*9.81)
             Sf= Q**2*n**2*P**(4/3)/(A**(10/3))
+            
+            
+            plot_i.append(float(p))
+            plot_yi.append(float(y))
+            plot_A.append(float(A))
+            plot_P.append(float(P))
+            plot_R.append(float(Rh))
+            plot_v.append(float(v))
+            plot_E.append(float(E))
+            plot_Sfi.append(float(Sf))
+
             if p>0:
                 Sfm=(Sf+Sfi)/2
                 So_Sfm=So-Sfm
@@ -889,23 +914,110 @@ def pasoDirecto(Q,n,So,b,m1,m2,um,d,y1,y2,pasos,datum,uQ,uSo,ub,ud,uy1,uy2):
                 
                 x=x+deltaX
                 fondo=datum-x*So
-                           
-                print (str(p),str("{0:.3f}".format(y)),str("{0:.3f}".format(A)),str("{0:.3f}".format(P)),str("{0:.3f}".format(Rh)),str("{0:.3f}".format(v)),str("{0:.3f}".format(E)),str("{0:.3f}".format(Sf)),str("{0:.3f}".format(Sfm)),str("{0:.3f}".format(So_Sfm)),str("{0:.3f}".format(deltaE)),str("{0:.3f}".format(deltaX)),str("{0:.3f}".format(x)),'\n')
-                    
-                    
-            else:
-                print (str(p),str("{0:.3f}".format(y)),str("{0:.3f}".format(A)),str("{0:.3f}".format(P)),str("{0:.3f}".format(Rh)),str("{0:.3f}".format(v)),str("{0:.3f}".format(E)),str("{0:.3f}".format(Sf)),'','','','',str(0),'\n')
-           
-            plot_x.append(float(x))
-            plot_fondo.append(float(fondo))
-            plot_y.append(float(y+fondo))
-            plot_yc.append(float(y_c+fondo))
-            if So!=0:
-                plot_yn.append(float(yn+fondo))
                 
-           
+                
+                plot_sfm.append(float(Sfm))
+                plot_So_Sfm.append(float(So_Sfm))
+                plot_deltaE.append(float(deltaE))
+                plot_deltaX.append(float(deltaX))
+                plot_x.append(float(x))
+                
+                
+     
+            else:
+                plot_sfm.append(0)
+                plot_So_Sfm.append(0)
+                plot_deltaE.append(0)
+                plot_deltaX.append(0)
+                plot_x.append(0)
+                
+            if So!=0:
+                yn_grafica=yn+fondo
+                plot_yn.append(float(yn_grafica))
+            else:
+                plot_yn.append(0)
+                
+            y_grafica=y+fondo
+            yc_grafica=y_c+fondo
+            plot_y.append(float(y_grafica))
+            plot_yc.append(float(yc_grafica))
+            plot_fondo.append(float(fondo))
             Sfi=Sf
             Ei=E
             y=y+deltaY
             p=p+1
-    print (plot_yn, plot_fondo)
+
+    return (plot_i, plot_yi, plot_A, plot_P, plot_R, plot_v, plot_E, plot_Sfi, plot_sfm, plot_So_Sfm, plot_deltaE, plot_deltaX, plot_x, plot_fondo, plot_y, plot_yc, plot_yn)
+
+def txt_pasoDirecto(plot_i, plot_yi, plot_A, plot_P, plot_R, plot_v, plot_E, plot_Sfi, plot_sfm, plot_So_Sfm, plot_deltaE, plot_deltaX, plot_x, plot_fondo, plot_y, plot_yc, plot_yn, ruta):
+    """Exporta archivo txt con resultados del paso directo\n
+    plot_i = iteracion
+    plot_yi = y(m)
+    plot_A = A(m2)
+    plot_P = P(m)
+    plot_R = R(m)
+    plot_v = v(m/s)
+    plot_E = E(m)
+    plot_Sfi = Sfi
+    plot_sfm = Sfm
+    plot_So_Sfm = So-Sfm
+    plot_deltaE = deltaE(m)
+    plot_deltaX = deltaX(m)
+    plot_x = x(m)
+    plot_fondo = Fondo(m)
+    plot_y = Altura(m)
+    plot_yc = yc(m)
+    plot_yn = yn(m)
+    ruta = ruta donde se quiere guardar el archivo
+    """
+    
+    plot_i.insert(0,"iteracion")
+    plot_yi.insert(0,"y(m)")
+    plot_A.insert(0,"A(m2)")
+    plot_P.insert(0,"P(m)")
+    plot_R.insert(0,"R(m)")
+    plot_v.insert(0,"v(m/s)")
+    plot_E.insert(0,"E(m)")
+    plot_Sfi.insert(0,"Sfi")
+    plot_sfm.insert(0,"Sfm")
+    plot_So_Sfm.insert(0,"So-Sfm")
+    plot_deltaE.insert(0,"deltaE(m)")
+    plot_deltaX.insert(0,"deltaX(m)")
+    plot_x.insert(0,"x(m)")
+    plot_fondo.insert(0,"Fondo(m)")
+    plot_y.insert(0,"Altura(m)")
+    plot_yc.insert(0,"yc(m)")
+    plot_yn.insert(0,"yn(m)")
+    
+    file = open(ruta, 'w')
+   
+    for index in range(len(plot_i)):
+        file.write(str(plot_i[index]) + "\t" + str(plot_yi[index]) + "\t" + str(plot_A[index]) + "\t" + str(plot_P[index]) + "\t" + str(plot_R[index]) + "\t" + str(plot_v[index]) + "\t" + str(plot_E[index]) + "\t" + str(plot_Sfi[index]) + "\t" + str(plot_sfm[index]) + "\t" + str(plot_So_Sfm[index]) + "\t" + str(plot_deltaE[index]) + "\t" + str(plot_deltaX[index]) + "\t" + str(plot_x[index]) + "\t" + str(plot_fondo[index]) + "\t" + str(plot_y[index]) + "\t" + str(plot_yc[index]) + "\t" + str(plot_yn[index]) + "\n")
+    file.close()
+    
+def grafica_pasoDirecto(plot_x,plot_fondo,plot_y,plot_yc,plot_yn,ruta):
+    """Grafica resultados de paso directo
+    plot_x = x(m)
+    plot_fondo = Fondo(m)
+    plot_y = Altura(m)
+    plot_yc = yc(m)
+    plot_yn = yn(m) 
+    """
+    
+    
+    plt.plot(plot_x,plot_fondo, color = '#804000', label = 'Fondo')
+    plt.plot(plot_x,plot_y, color = '#4472C4', label = 'Altura')
+    plt.plot(plot_x,plot_yc, color = '#FF0000', label = 'yc')
+    plt.plot(plot_x,plot_yn, color = '#70AD47', label = 'yn')
+    plt.xlabel('x')
+    plt.ylabel('Altura')
+    titulo = 'Perfil de flujo (m)'
+    plt.title(titulo)
+    plt.rcParams["figure.figsize"] = (25,10)
+    plt.grid()
+    plt.legend()
+    plt.savefig(ruta)
+    plt.show() 
+
+
+#pasoDirecto(27,0.014,0.02,6.5,2,2,"m",0,1,1.4,20,0,"m3/s","m","m","m","m","m")
