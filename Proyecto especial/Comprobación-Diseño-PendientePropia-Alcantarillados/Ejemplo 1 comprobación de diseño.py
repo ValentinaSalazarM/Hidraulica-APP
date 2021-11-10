@@ -189,7 +189,6 @@ def CauL(d,Ryd,So,ks,vi,g,uni):
     """ Calcula el caudal que pasa por la tuberia \n
         
     Parámetros:
-        y (float) altura del agua.
         d (float) diametro.
         Ryd (float) Porcentaje de la relación y/d. 
         So (float) inclinación del fondo de la tuberia.
@@ -211,14 +210,13 @@ def T(d,Ryd,uni):
     """ Calcula el espejo de agua\n
         
     Parámetros:
-        y (float) altura del agua.
         d (float) diametro.
         Ryd (float) Porcentaje de la relación y/d. 
         uni Unidades propiedades (mm,cm,m,in)            
     Retorna:
         float: El espejo de agua.
     """
-    
+    d = cambio_unidades(uni,d)
     T = d * np.cos((Theta(d,Ryd,uni)-np.pi)/2)
     return T
 
@@ -229,7 +227,6 @@ def D(d,Ryd,uni):
     """ Calcula la profundidad hidráulica\n
         
     Parámetros:
-        y (float) altura del agua.
         d (float) diametro.
         Ryd (float) Porcentaje de la relación y/d.   
         uni Unidades propiedades (mm,cm,m,in)                
@@ -247,7 +244,6 @@ def Fr (d, Ryd, So, ks, vi, g,uni):
     """ Calcula el número de Froude \n
         
     Parámetros:
-        y (float) altura del agua.
         d (float) diametro.
         Ryd (float) Porcentaje de la relación y/d. 
         So (float) inclinación del fondo de la tuberia.
