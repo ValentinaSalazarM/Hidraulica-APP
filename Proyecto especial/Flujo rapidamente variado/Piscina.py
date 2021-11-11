@@ -175,7 +175,7 @@ def ciclo_Fr(sigma, yn, y, yo, delta_y, Q, b, g, S, uni, uni2):
 
 #print(y2(y,21,0,375,20,9.81,0.7,'m','m^3/s'))
 #print(delta_y_i(sigma,yn,y,21,0,375,20,9.81,0.7,'m','m^3/s'))
-print(ciclo_Fr(sigma,yn,y,21,0,375,20,9.81,0.7,'m','m^3/s'))
+#print(ciclo_Fr(sigma,yn,y,21,0,375,20,9.81,0.7,'m','m^3/s'))
 
 
 
