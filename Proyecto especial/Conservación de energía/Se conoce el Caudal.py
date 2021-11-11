@@ -10,8 +10,6 @@ import sympy as sp
 from sympy import *
 from matplotlib import pyplot as plt
 
-'1/tan30 = 1.73205'
-'1/tan60 = 0.57735'
 
 'Variables para la solución del problema'
 

@@ -13,7 +13,7 @@ from sympy import *
 
 #Variables para la solución del problema'
 
-y1,y2,yc = symbols('y1 y2 yc')
+y1,y2,y = symbols('y1 y2 y')
 
 ##Desarrollo método de paso estandar,
 '-----------------------------------------------------------------------------'
@@ -217,8 +217,8 @@ def yn(Q,n,So):
     
     yn = n*Q/sqrt(So)
 
-print(Area("yc", b2, m1, m2,'m','m',))
-#print(yc(Q,'yc',b2,0,0,g,'m','m','m^3/s'))
+#print(Area(y, b2, m1, m2,'m','m',))
+print(yc(Q,y,b2,0,0,g,'m','m','m^3/s'))
 
 
 
