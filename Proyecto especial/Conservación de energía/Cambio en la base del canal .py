@@ -11,22 +11,8 @@ from matplotlib import pyplot as plt
 from sympy import *
 yin, m, yc, Ec, y2, v2= symbols('yin m yc Ec y2 v2')
 
-'Contracción del canal'
+##Desarrollo para cambio en la base del canal, parámetros b,y1,v1,z1,z2
 '-----------------------------------------------------------------------------'
-
-'Variables por default necesarias para las funciones'
-
-m1 = 0
-m2 = 0
-
-'Gravedad'
-g = 9.81
-
-y1 = 3.8
-b1 = 16
-b2 = 4
-v1 = 1.05
-
 '-----------------------------------------------------------------------------'
 
 def cambio_unidades(unidad,propiedad):

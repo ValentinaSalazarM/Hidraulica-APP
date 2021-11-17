@@ -10,32 +10,14 @@ import sympy as sp
 from sympy import *
 from matplotlib import pyplot as plt
 
-'1/tan30 = 1.73205'
-'1/tan60 = 0.57735'
 
 'Variables para la solución del problema'
 
-y2, y = symbols('y2 y')
+y1,y2 = symbols('y1 y2')
 
-'Elevación del fondo del canal'
-
-'Datos de entrada'
-
-
-y1 = 4.5
-v1 = 1.25
-z1 = 0
-z2 = 1.05
-
-'Variables por default necesarias para las funciones'
-
-m1 = 1
-m2 = 1
-
-'Gravedad'
-g = 9.81
-
-'Funciones para el desarrollo'
+##Desarrollo con caudal conocido, parámetros b,Q,v1,z1,z2
+'-----------------------------------------------------------------------------'
+'-----------------------------------------------------------------------------'
 
 def cambio_unidades(unidad,propiedad):
     
@@ -84,20 +66,20 @@ def cambio_angulo(unidad,propiedad):
     if unidad == 'radianes':
         
         temp = 1/np.tan(propiedad)
-        
+    
     else:
         temp = propiedad
         
     return temp
 
-def Area(b,y,m1,m2,uni,uni2):
+def Area(y,b,m1,m2,uni,uni2):
     
     """ Esta función retorna el área transversal según la figura\n
         
     Parámetros:
-        b (float) base del canal
         y (float) altura del agua
-        m1 (float) Pendiente parte izquierda de un trapecio
+        b (float) base del canal
+        m1 (int) Pendiente del lado izquierdo o pendientre triangular del canal 
         m2 (float) Pendiente parte derecha de un trapecio
         uni Unidades propiedades (mm,cm,m,in)
         uni2 Unidades angulo (grados,radianes,m)
@@ -120,87 +102,139 @@ def Area(b,y,m1,m2,uni,uni2):
             
     else:
         
+        
         if m1 == m2:
                 
             A = (b+m1*y)*y
                 
         else:
-            
+                
             A = m1*y**2/2+b*y+m2*y**2/2 
-        
+            
     return A
 
-
-
-def Qfun(b,y,m1,m2,uni,uni2):
+def calculo_dz(z1,z2,uni):
     
-    """ Esta función retorna el caudal según la sección transversal\n
+    """ Esta función retorna el valor de deltaz\n
+    Parametros:
+        z1 (float) Altura del fondo del canal en la sección 1  
+        z2 (float) Altura del fondo del canal en la sección 2
+        uni Unidades propiedades (mm,cm,m,in)
+    Retorna:
+        float: La diferencia de alturas del fondo del canal[m]
+    """
+    
+    z1 = cambio_unidades(uni,z1)
+    z2 = cambio_unidades(uni,z2)
+    
+    return abs(z1-z2)
+    
+def calculo_y1(y1,Q,v1,b,m1,m2,uni,uni2):
+    
+    """ Esta función retorna el valor de y1\n
         
     Parámetros:
+        y1 (symbol) variable que se quiere calcular
+        Q (float) Caudal del canal [m3/s]
+        v1 (float) Velocidad de la sección 1
         b (float) base del canal
-        y (float) altura del agua
-        m1 (float) Pendiente parte izquierda de un trapecio
-        m2 (float) Pendiente parte derecha de un trapecio
+        m1 (int) Pendiente del lado izquierdo o pendientre triangular del canal 
+        m2 (int) Pendiente parte derecha de un trapecio
         uni Unidades propiedades (mm,cm,m,in)
         uni2 Unidades angulo (grados,radianes,m)
     Retorna:
-        float: El cuadal de la sección transversal [m^3/s]
+        float: La altura del agua en la seccion 1 [m]
     """
     
-    Q = v1 * Area(b,y,m1,m2,uni,uni2) 
+    b = cambio_unidades(uni,b)
+    m1 = cambio_angulo(uni2,m1)
+    m2 = cambio_angulo(uni2,m2)
     
-    return Q
+    if m1 == 0 and m2 == 0:
+        
+        ecu = Eq(Q,v1*(b * y1))
+        
+        y1 = solve(ecu)
+        
+        return round(y1[0],2)
+
+    elif b == 0:
+        
+        ecu = Eq(Q,v1*y1**2 * m1)
+            
+        y1 = solve(ecu)
+            
+        return round(y1[1],2)
+            
+    else:
+        
+        if m1 == m2:
+                
+            ecu = Eq(Q,v1*((b+m1*y1)*y1))
+                
+            y1 = solve(ecu)
+                
+            return round(y1[1],2)
+                
+        else:
+                
+            ecu = Eq(Q,v1*(m1*y1**2/2+b*y1+m2*y1**2/2))
+                
+            y1 = solve(ecu)
+                
+            return round(y1[1],2)
+    return "Error en y1"
 
 
-def Q_en_litros(b,y,m1,m2,uni,uni2):
+def Q_en_litros(Q):
     
     """ Esta función retorna el caudal en L/s \n
 
     Parámetros:
-        b (float) base del canal
-        y (float) altura del agua
-        m1 (float) Pendiente parte izquierda de un trapecio
-        m2 (float) Pendiente parte derecha de un trapecio
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        Q (float) Caudal en m^3/s
     Retorna:
         float: El cuadal de la sección transversal [L/s]
     """
     
-    QL = Qfun(b,y,m1,m2,uni,uni2) *1000
+    QL = Q *1000
     return QL
 
 
 
-def y2fun(y2,b,y1,m1,m2,v1,z1,z2,g,uni,uni2):
+def y2fun(y1,y2,Q,v1,b,m1,m2,z1,z2,g,uni,uni2):
     
     """ Esta función retorna la altura del agua en la sección dos\n
         
     Parámetros:
+        y1 (symbol) variable que se quiere calcular
         y2 (symbol) variable que se quiere calcular
+        Q (float) Caudal del canal
+        v1 (float) Velocidad de la sección 1
         b (float) base del canal
-        y1 (float) altura del agua en la sección 1
-        m1 (float) Pendiente parte izquierda de un trapecio
+        m1 (int) Pendiente del lado izquierdo o pendientre triangular del canal 
         m2 (float) Pendiente parte derecha de un trapecio
-        v1 (float) velocidad de la sección 1 del canal
-        z1 (float) Altura del fondo del canal en la sección 1  
-        z2 (float) Altura del fondo del canal en la sección 2
         g (float) Aceleración gravitacional, generalmente 9.81 
         uni Unidades propiedades (mm,cm,m,in)
         uni2 Unidades angulo (grados,radianes,m)
     Retorna:
         float: La altura del agua en la sección 2 [m]
     """
+    b = cambio_unidades(uni,b)
+    m1 = cambio_angulo(uni2,m1)
+    m2 = cambio_angulo(uni2,m2)
+    y1 = calculo_y1(y1,Q,v1,b,m1,m2,uni,uni2)
+    dz = calculo_dz(z1,z2,uni)
+    
     
     if m1 == 0 and m2 == 0:
         
-        ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,m1,m2,uni,uni2)**2)/(2*g*(b*y2)**2))+z2)
+        ec1 = Eq(y1+((v1**2)/(2*g))+dz,y2+((Q**2)/(2*g*(b*y2)**2)))
     
         y2 = solve(ec1)
     
     elif b == 0:
         
-        ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,m1,m2,uni,uni2)**2)/(2*g*(y2**2*m1)**2))+z2)
+        ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Q**2)/(2*g*(y2**2*m1)**2))+z2)
     
         y2 = solve(ec1)       
     
@@ -208,25 +242,33 @@ def y2fun(y2,b,y1,m1,m2,v1,z1,z2,g,uni,uni2):
         
         if m1 == m2:
                 
-            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,m1,m2,uni,uni2)**2)/(2*g*((b+m1*y2)*y2)**2))+z2)
+            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Q**2)/(2*g*((b+m1*y2)*y2)**2))+z2)
     
             y2 = solve(ec1)
                 
         else:
-            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Qfun(b,y1,m1,m2,uni,uni2)**2)/(2*g*(m1*y2**2/2+b*y2+m2*y2**2/2)**2))+z2)
+            ec1 = Eq(y1+((v1**2)/(2*g))+z1,y2+((Q**2)/(2*g*(m1*y2**2/2+b*y2+m2*y2**2/2)**2))+z2)
             
             y2 = solve(ec1)
     
-    return y2 
+    i=0
+    y =[]
+    
+    while i<len(y2):
+        
+        y.append(round(y2[i],3))
+        i+=1
+    
+    return y 
 
-def grafica2 (b,y1,m1,m2,uni,uni2):
+
+def grafica3 (b,m1,m2,uni,uni2):
 
     """ Esta función grafica la gráfica de enerigía específica \n
         según la sección transversal
     Parametros:
         b (float) base del canal
-        y1 (float) altura del agua
-        m1 (float) Pendiente parte izquierda de un trapecio
+        m1 (int) Pendiente del lado izquierdo o pendientre triangular del canal 
         m2 (float) Pendiente parte derecha de un trapecio
         uni Unidades propiedades (mm,cm,m,in)
         uni2 Unidades angulo (grados,radianes,m)
@@ -234,16 +276,19 @@ def grafica2 (b,y1,m1,m2,uni,uni2):
         plot: Gráfica de energía específica[m]
     """
 
-    A = 0    
+    b = cambio_unidades(uni,b)
+    m1 = cambio_angulo(uni2,m1)
+    m2 = cambio_angulo(uni2,m2)
+
 
     x = np.linspace(0,10,10)
 
     yg = np.linspace(0.2,10,300) 
     
-    Ei = yg + (Qfun(b,y1,m1,m2,uni,uni2))**2/(2*g*(Area(b,yg,m1,m2,uni,uni2))**2)  
+    Ei = yg + (Q**2/(2*g*(Area(yg,b,m1,m2,uni,uni2))**2))
 
     plt.style.use('classic')
-    plt.plot(Ei,yg,label = 'S')
+    plt.plot(Ei,yg,label = 'S8')
     plt.plot(x,x, label = 'E = y', linestyle='dashed')
     plt.xlabel('E (m)')
     plt.ylabel('y (m)')
@@ -254,37 +299,45 @@ def grafica2 (b,y1,m1,m2,uni,uni2):
 
 def imprimir_valores():
     
-    """ Esta función retorna los valores del caudal, el área y la gráfica
+    """ Esta función retirna los valores del caudal, el área y la gráfica
     Retorna:
         plot: Gráfica de energía específica
         str: Mensaje con los valores de caudal y área
     """
     
-    grafica2(b,y1,m1,m2,'m','')
-    yf = y2fun(y2,b,y1,m1,m2,v1,z1,z2,g,'m','')
+    b=10
+    y1=4.5
+    v1=1.25
+    z1=0
+    z2=1.05
+    m1=0
+    m2=0
     
+    
+    yf = y2fun(y1,y2,Q,v1,b,m1,m2,z1,z2,g,'m','')
+    grafica3(b,m1,m2,'m','')
     i=0
     y =[]
     
     while i<len(yf):
         
-        y.append(round(yf[i],3))
+        y.append(str(round(yf[i],3)) + ' [m]')
         i+=1
-    
-    msg1 = '\nEl área transversal 1 es: '+str(round(Area(b,y1,m1,m2,'m',''),3)) 
-    msg2 = '\nEl cuadal [l/s] es:'+str(round(Q_en_litros(b,y1,m1,m2,'m',''),4)) 
+        
+    msg1 = '\nLa altura inicial del agua (y1) es: '+str(calculo_y1(y1,Q,v1,b,m1,m2,'m',''))+' [m]'
+    msg2 = '\nEl cuada es:'+str(round(Q_en_litros(Q),4))+ ' [l/s]'
     msg3 = '\nLos valores de y2 son: '+ str(y)
-    if b!=0 and m1 !=0 and m2 != 0:
+    
+    if b!=0 and m1!=0 and m2 !=0:
         msg4 = '\nLa altura final del agua (y2) es: '+str(round(max(yf),2))
-        msg6 = '\nEl área transversal 2 es: '+str(round(Area(b,max(yf),m1,m2,'m',''),3)) 
     else:
         msg4 = '\nLa altura final del agua (y2) es: '+str(y[2])
-        msg6 = '\nEl área transversal 2 es: '+str(round(Area(b,y[2],m1,m2,'m',''),3)) 
+        
+    msg5 = '\nEl valor de delta z es: '+str(round(calculo_dz(z1,z2,'m'),2))+' [m]'
     
-    temp = msg1 +msg6+ msg2 +msg3 +msg4
+    msg = msg1 + msg2 +msg3 +msg4 +msg5
     
-    return temp
-
+    return msg 
 
 print(imprimir_valores())
 
