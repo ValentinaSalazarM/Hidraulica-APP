@@ -297,7 +297,7 @@ def calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
         Ec (symbol) variable que se quiere calcular
         yc (float) altura critica del agua
         y1 (float) altura del agua de la sección 1
-        y2 (symbol) variable que se quiere calcular
+        y2 (float) altura del agua de la sección 2
         v1 (float) Velocidad de la sección 1
         b1 (float) base del canal en la sección 1
         b2 (float) base del canal en la sección 2
@@ -317,6 +317,24 @@ def calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
     return Ec
 
 def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
+    
+    """ Esta función retorna la nueva altura inicial del agua \n     
+    Parámetros:
+        Ec (symbol) variable que se quiere calcular
+        yin (symbol) variable que se requiere calcular
+        y1 (float) altura del agua de la sección 1
+        y2 (float) altura del agua de la sección 2
+        v1 (float) Velocidad de la sección 1
+        b1 (float) base del canal en la sección 1
+        b2 (float) base del canal en la sección 2
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        g (float) Aceleración gravitacional, generalmente 9.81 
+        uni Unidades propiedades (mm,cm,m,in)
+        uni2 Unidades angulo (grados,radianes,m)
+    Retorna:
+        float: La velocidad del agua en la sección 2 [m]
+    """
     
     Q = Qfun(y1,b1,m1,m2,uni,uni2)
     Ec = calculo_Ec(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2)[0]
