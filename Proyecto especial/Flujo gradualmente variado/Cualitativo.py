@@ -280,7 +280,7 @@ def TipoSeccion(n,Q,S,g,y,b,m1,m2,uni,uni2):
 
 def abrir_imagen(im):
     
-    ruta ='D:/Documents/Hidraulica-APP/Proyecto especial/Flujo gradualmente variado/' + im + '.jfif'
+    ruta ='D:/Documents/Hidraulica-APP/Proyecto especial/Flujo gradualmente variado/' + im + '.jpeg'
     im = Image.open(ruta)
     im.show()
 
