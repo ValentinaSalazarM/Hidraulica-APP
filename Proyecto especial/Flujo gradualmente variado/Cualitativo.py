@@ -110,6 +110,8 @@ def Area(y,b,m1,m2,uni,uni2):
             
     return A
 
+print(Area(ys, 0, 50, 0, 'm', 'grados'))
+
 def Perimetro(y,b,m1,m2,uni,uni2):
     """ Esta función retorna el perimetro de la sección transversal\n
         
@@ -147,6 +149,8 @@ def Perimetro(y,b,m1,m2,uni,uni2):
             P = b + y*sqrt(1+m1**2)+y*sqrt(1+m2**2)
     
     return P
+
+print(Perimetro(ys, 0, 50, 0, 'm', 'grados'))
 
 def T(y,b,m1,m2,uni,uni2):
     
@@ -203,6 +207,14 @@ def yc(Q,g,y,b,m1,m2,uni,uni2):
         
         yc = yc[1]
         
+    if m1 == 0 and m2 == 0:
+       
+        yc = yc[0]
+        
+    else:
+        
+        yc = yc[0]
+        
     return yc
     
 
@@ -212,8 +224,28 @@ def yn (n,Q,S,y,b,m1,m2,uni,uni2):
     
     temp2 = Eq(temp, Area(ys,b,m1,m2,uni,uni2)**(5/3)/Perimetro(ys,b,m1,m2,uni,uni2)**(2/3))
     
-    yn = float(solve(temp2)[0])
-    
+    if S == 0:
+        
+        yn = 'Infinito'
+        
+    elif S < 0:
+        
+        yn = 'No existe'
+        
+    else:
+        
+        if b!= 0 and m1 != 0 and m2 != 0:
+            
+            yn = float(solve(temp2)[0])
+            
+        if m1 == 0 and m2 == 0:
+       
+            yn = solve(temp2)[0]
+        
+        else:
+        
+            yn = solve(temp2)[0]
+                   
     return yn
 
 def TipoSeccion(n,Q,S,g,y,b,m1,m2,uni,uni2):
@@ -221,25 +253,27 @@ def TipoSeccion(n,Q,S,g,y,b,m1,m2,uni,uni2):
     yc1 = yc(Q,g,y,b,m1,m2,uni,uni2)
     yn1 = yn (n,Q,S,y,b,m1,m2,uni,uni2)
     
-    if  yn1>yc1:
-    
-        msg = 'Suave'
-        
-    if yc1>yn1:
-        
-        msg = 'Empinada'
-    
-    if yc1 == yn1:
-        
-        msg = 'Critica'
-        
     if S == 0:
     
         msg = 'Horizontal'    
     
-    if S < 0:
+    elif S < 0:
         
         msg = 'Adversa'
+    
+    elif  yn1>yc1:
+    
+        msg = 'Suave'
+        
+    elif yc1>yn1:
+        
+        msg = 'Empinada'
+    
+    elif yc1 == yn1:
+        
+        msg = 'Critica'
+        
+    
         
     return msg
 
@@ -325,13 +359,13 @@ def tipoZona (yin, n, Q, S, g, y, b, m1, m2, uni, uni2):
 
 
 
+print('yc ,',yc(74.3, 9.81, ys, 0, 50, 0, 'm', 'grados'))
+print('yn ,',yn(0.013, 74.3, 0.1, ys, 0, 50, 0, 'm', 'grados'))
 
-#print('yn ,',round(yn(0.013, 74.3, 0.002, ys, 8.3, 50, 50, 'm', 'grados'),2))
-#print('yc ,',round(yc(74.3,9.81,ys,8.3, 50, 50, 'm', 'grados'),2))
-#yin = 1.7
-#print('yc ,',yin)
+yin = 1
+print('yin ,',yin)
 
-#tipoZona(yin, 0.013, 74.3, 0.002, 9.81, ys, 8.3, 50, 50, 'm', 'grados')
+tipoZona(yin, 0.013, 74.3, 0.1, 9.81, ys, 0, 50, 0, 'm', 'grados')
 
 
 
