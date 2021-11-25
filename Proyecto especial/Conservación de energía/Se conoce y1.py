@@ -294,9 +294,7 @@ def grafica2 (v1,b,y,m1,m2,g,unib,uniy,unim):
     plt.ylim(0,10)
     plt.legend(loc='upper left')
     plt.show()
-    
-    print('x', x)
-    print('Ei',Ei)
+
     
 def grafica2_txt (v1,b,y,m1,m2,g,unib,uniy,unim, ruta):
 
@@ -318,43 +316,36 @@ def grafica2_txt (v1,b,y,m1,m2,g,unib,uniy,unim, ruta):
     
     x = np.linspace(0,10,10)
     yg = np.linspace(0.2,10,300) 
-
-    A = Area(b,yg,m1,m2,unib,uniy,unim)
-    Q = Qfun(v1,b,y,m1,m2,unib,uniy,unim)
-   
-    Ei = yg + (Q)**2/(2*g*(A)**2)  
-    
+    Q = Qfun(v1,b,y1,m1,m2,unib,uniy,unim)
     
     file = open(ruta, 'w')
    
     for index in range(len(yg)):
-        file.write(str(yg[index]) + "\t" + str(Ei[index]) + "\n")
+        
+        A = Area(b,yg[index],m1,m2,unib,uniy,unim)
+        
+        Ei = yg[index] + (Q)**2/(2*g*(A)**2)  
+        
+        file.write(str(yg[index]) + ";" + str(Ei) + "\n")
+        
+    file.write("Linea Recta\n")
+    
+    for index in range(len(x)):
+        
+        file.write(str(x[index]) + ";" + str(x[index]) + "\n")
+        
     file.close()
     
     
     
 
-def imprimir_valores():
+def imprimir_valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
     
     """ Esta función retorna los valores del caudal, el área y la gráfica
     Retorna:
         plot: Gráfica de energía específica
         str: Mensaje con los valores de caudal y área
     """
-    unib = 'm'
-    uniy = 'm'
-    uniz1 = 'm'
-    uniz2 = 'm'
-    unim = ''
-    
-    b=10
-    y1=4.5
-    v1=1.25
-    z1=0
-    z2=1.05
-    m1=0
-    m2=0
-    g = 9.81
     
     b = cambio_unidades(unib,b)
     y1 = cambio_unidades(uniy,y1)
@@ -424,7 +415,7 @@ uniy = 'm'
 uniz1 = 'm'
 uniz2 = 'm'
 unim = ''
-ruta = '\.'
+ruta = './seconocey1.txt'
 
 b=10
 y1=4.5
@@ -435,10 +426,10 @@ m1=0
 m2=0
 g = 9.81
 
-#print(imprimir_valores())
+
+#print(imprimir_valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
 #print(valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
-#print(y2fun(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
-print(grafica2_txt (v1,b,y,m1,m2,g,unib,uniy,unim, ruta))
+#print(grafica2_txt (v1,b,y,m1,m2,g,unib,uniy,unim, ruta))
 
 
 
