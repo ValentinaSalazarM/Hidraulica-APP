@@ -312,6 +312,7 @@ def imprimir_valores():
     z2=1.05
     m1=0
     m2=0
+    g=9.81
     
     
     yf = y2fun(y1,y2,Q,v1,b,m1,m2,z1,z2,g,'m','')
