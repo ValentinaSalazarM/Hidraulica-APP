@@ -415,7 +415,7 @@ uniy = 'm'
 uniz1 = 'm'
 uniz2 = 'm'
 unim = ''
-ruta = './seconocey1.txt'
+ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/seconocey1.txt'
 
 b=10
 y1=4.5
@@ -429,7 +429,7 @@ g = 9.81
 
 #print(imprimir_valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
 #print(valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
-#print(grafica2_txt (v1,b,y,m1,m2,g,unib,uniy,unim, ruta))
+print(grafica2_txt (v1,b,y,m1,m2,g,unib,uniy,unim, ruta))
 
 
 

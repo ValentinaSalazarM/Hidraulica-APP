@@ -475,7 +475,7 @@ uniy = 'm'
 uniz1 = 'm'
 uniz2 = 'm'
 unim = ''
-ruta = './seconocecaudal.txt'
+ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/seconocecaudal.txt'
 
 Q=55
 b=5
@@ -488,7 +488,7 @@ g=9.81
 
 #print(imprimir_valores(y1, y2, Q, v1, b, m1, m2, z1, z2, g, uniQ, unib, unim, uniz1, uniz2))
 #print(valores(y1, y2, Q, v1, b, m1, m2, z1, z2, g, uniQ, unib, unim, uniz1, uniz2))
-#print(grafica3_txt (y1, y2, Q, v1, b, m1, m2, z1, z2, g, uniQ, unib, unim, uniz1, uniz2, ruta))
+print(grafica3_txt (y1, y2, Q, v1, b, m1, m2, z1, z2, g, uniQ, unib, unim, uniz1, uniz2, ruta))
 
 
 
