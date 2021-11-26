@@ -9,7 +9,7 @@ import numpy as np
 import sympy as sp
 from matplotlib import pyplot as plt
 from sympy import *
-yin, m, yc, Ec, y2, v2= symbols('yin m yc Ec y2 v2')
+yin, m, yc, Ec, y2, v2, At= symbols('yin m yc Ec y2 v2 At')
 
 ##Desarrollo para cambio en la base del canal, parámetros b,y1,v1,z1,z2
 '-----------------------------------------------------------------------------'
@@ -68,7 +68,7 @@ def cambio_angulo(unidad,propiedad):
         
     return temp
 
-def Area(y,b,m1,m2,uni,uni2):
+def Area(y,b,m1,m2,uniy,unib,unim):
     
     """ Esta función retorna el área transversal según la figura\n
         
@@ -77,16 +77,17 @@ def Area(y,b,m1,m2,uni,uni2):
         b (float) base del canal
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades de la altura propiedades (mm,cm,m,in)
+        unib Unidades de la base propiedades (mm,cm,m,in)
+        unim Unidades de inclinación (grados,radianes,m)
     Retorna:
         float: El área de la sección transversal [m^2]
     """
     
-    y = cambio_unidades(uni,y)
-    b = cambio_unidades(uni,b)
-    m1 = cambio_angulo(uni2,m1)
-    m2 = cambio_angulo(uni2,m2)
+    y = cambio_unidades(uniy,y)
+    b = cambio_unidades(unib,b)
+    m1 = cambio_angulo(unim,m1)
+    m2 = cambio_angulo(unim,m2)
     
     if m1 == 0 and m2 == 0:
         
@@ -107,7 +108,7 @@ def Area(y,b,m1,m2,uni,uni2):
 
 
 
-def Tfun(y,b,m1,m2,uni,uni2):
+def Tfun(y,b,m1,m2,uniy,unib,unim):
     
     """ Esta función retorna el espejo de agua según la sección transversal\n
         
@@ -116,16 +117,17 @@ def Tfun(y,b,m1,m2,uni,uni2):
         b (float) base del canal
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades de la altura propiedades (mm,cm,m,in)
+        unib Unidades de la base propiedades (mm,cm,m,in)
+        unim Unidades de inclinación (grados,radianes,m)
     Retorna:
         float: El espejo de agua de la sección transversal [m]
     """
 
-    y = cambio_unidades(uni,y)
-    b = cambio_unidades(uni,b)
-    m1 = cambio_angulo(uni2,m1)
-    m2 = cambio_angulo(uni2,m2)
+    y = cambio_unidades(uniy,y)
+    b = cambio_unidades(unib,b)
+    m1 = cambio_angulo(unim,m1)
+    m2 = cambio_angulo(unim,m2)
 
     if m1 == 0 and m2 == 0:
         
@@ -145,27 +147,29 @@ def Tfun(y,b,m1,m2,uni,uni2):
     return T
     
 
-def Qfun(y,b,m1,m2,uni,uni2):
+def Qfun(v1,y,b,m1,m2,uniy,unib,unim):
     
     """ Esta función retorna el caudal según la sección transversal\n
         
     Parámetros:
+        v1 (float) Velocidad de la sección 1
         y (float) altura del agua
         b (float) base del canal
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades de la altura propiedades (mm,cm,m,in)
+        unib Unidades de la base propiedades (mm,cm,m,in)
+        unim Unidades de inclinación (grados,radianes,m)
     Retorna:
         float: El cuadal de la sección transversal [m^3/s]
     """
     
-    Q = v1 * Area(y,b,m1,m2,uni,uni2) 
+    Q = v1 * Area(y,b,m1,m2,uniy,unib,unim) 
     
     return Q
 
 
-def y2fun(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
+def y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
     """ Esta función retorna la altura del agua en la sección dos\n
     Parámetros:
@@ -177,17 +181,19 @@ def y2fun(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
         g (float) Aceleración gravitacional, generalmente 9.81 
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades de la altura propiedades (mm,cm,m,in)
+        unib1 Unidades de la base1 propiedades (mm,cm,m,in)
+        unib2 Unidades de la base2 propiedades (mm,cm,m,in)
+        unim Unidades de inclinación (grados,radianes,m)
     Retorna:
         float: La altura del agua en la sección 2 [m]
     """
-    y1 = cambio_unidades(uni,y1)
-    b1 = cambio_unidades(uni,b1)
-    b2 = cambio_unidades(uni,b2)
-    m1 = cambio_angulo(uni2,m1)
-    m2 = cambio_angulo(uni2,m2)
-    Q = Qfun(y1,b1,m1,m2,uni,uni2)
+    y1 = cambio_unidades(uniy,y1)
+    b1 = cambio_unidades(unib1,b1)
+    b2 = cambio_unidades(unib2,b2)
+    m1 = cambio_angulo(unim,m1)
+    m2 = cambio_angulo(unim,m2)
+    Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
     
     if m1 == 0 and m2 == 0:
         
@@ -195,7 +201,7 @@ def y2fun(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
     
         y2 = solve(ec1)  
     
-    if b!= 0 and m1 != 0 and m2 != 0:
+    if b1!= 0 and m1 != 0 and m2 != 0:
         
         if m1 == m2:
                 
@@ -229,26 +235,34 @@ def y2fun(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
 
 
 
-def calculo_yc(yc,y1,b1,b2,m1,m2,g,uni,uni2):
+def calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
     """ Esta función retorna la altura crítica del agua\n
         
     Parámetros:
         yc (symbol) variable que se quiere calcular
         y1 (float) altura del agua de la sección 1
+        v1 (float) Velocidad de la sección 1
         b1 (float) base del canal en la sección 1
         b2 (float) base del canal en la sección 2
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
         g (float) Aceleración gravitacional, generalmente 9.81 
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades de la altura propiedades (mm,cm,m,in)
+        unib1 Unidades de la base1 propiedades (mm,cm,m,in)
+        unib2 Unidades de la base2 propiedades (mm,cm,m,in)
+        unim Unidades de inclinación (grados,radianes,m)
     Retorna:
         float: La altura crítica del agua [m]
     """
     
-    Q = Qfun(y1,b1,m1,m2,uni,uni2)
-    ec1 = Eq(Q/sqrt(g),(Area(yc, b2, m1, m2,uni,uni2)*sqrt(Area(yc, b2, m1, m2,uni,uni2)))/sqrt(Tfun(yc, b2, m1, m2,uni,uni2)))
+    Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
+    
+    A = Area(yc,b2,m1,m2,uniy,unib2,unim)
+    
+    T = Tfun(yc,b2,m1,m2,uniy,unib2,unim)
+    
+    ec1 = Eq(Q/sqrt(g),(A*sqrt(A))/sqrt(T))
             
     yc = solve(ec1)[0]
     
@@ -256,7 +270,7 @@ def calculo_yc(yc,y1,b1,b2,m1,m2,g,uni,uni2):
 
 
 
-def calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
+def calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
     """ Esta función retorna la velocidad del agua en la sección dos\n     
     Parámetros:
@@ -268,58 +282,97 @@ def calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
         g (float) Aceleración gravitacional, generalmente 9.81 
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades de la altura propiedades (mm,cm,m,in)
+        unib1 Unidades de la base1 propiedades (mm,cm,m,in)
+        unib2 Unidades de la base2 propiedades (mm,cm,m,in)
+        unim Unidades de inclinación (grados,radianes,m)
     Retorna:
         float: La velocidad del agua en la sección 2 [m]
     """
     
-    if y2fun(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2) == "Fenomeno de choque, se requiere calcular yc\n":
-        ecu = Eq(Qfun(y1,b1,m1,m2,uni,uni2),v2*Area(calculo_yc(yc,y1,b1,b2,m1,m2,g,uni,uni2),b2,m1,m2,uni,uni2))
+    y_2 = y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
+    
+    if y_2 == "Fenomeno de choque, se requiere calcular yc\n":
+        
+        y_c = calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+        A = Area(y_c,b2,m1,m2,uniy,unib2,unim)
+        
+        ecu = Eq(Q,v2*A)
         v = solve(ecu)
     else:
         if m1 == 0 and m2 == 0:
             
-            ecu = Eq(Qfun(y1,b1,m1,m2,uni,uni2),v2*Area(y2fun(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2)[2],b2,m1,m2,uni,uni2))
+            A = Area(y_2[2],b2,m1,m2,uniy,unib2,unim)
+            
+            ecu = Eq(Q,v2*A)
             v = solve(ecu)
             
-        if b!= 0 and m1 != 0 and m2 != 0:
-            ecu = Eq(Qfun(y1,b1,m1,m2,uni,uni2),v2*Area(max(y2fun(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2)),b2,m1,m2,uni,uni2))
+        if b1!= 0 and m1 != 0 and m2 != 0:
+            
+            A = Area(max(y_2),b2,m1,m2,uniy,unib2,unim)
+            
+            ecu = Eq(Q,v2*A)
             v = solve(ecu)
     
     return v
 
 
-def calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
+def calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
 
     """ Esta función retorna la velocidad del agua en la sección dos\n     
     Parámetros:
         Ec (symbol) variable que se quiere calcular
         yc (float) altura critica del agua
         y1 (float) altura del agua de la sección 1
-        y2 (symbol) variable que se quiere calcular
+        y2 (float) altura del agua de la sección 2
         v1 (float) Velocidad de la sección 1
         b1 (float) base del canal en la sección 1
         b2 (float) base del canal en la sección 2
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
         g (float) Aceleración gravitacional, generalmente 9.81 
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades de la altura propiedades (mm,cm,m,in)
+        unib1 Unidades de la base1 propiedades (mm,cm,m,in)
+        unib2 Unidades de la base2 propiedades (mm,cm,m,in)
+        unim Unidades de inclinación (grados,radianes,m)
     Retorna:
         float: La velocidad del agua en la sección 2 [m]
     """
     
-    ecu = Eq(Ec,calculo_yc(yc,y1,b1,b2,m1,m2,g,uni,uni2) + calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uni,uni2)[0]**2/(2*g))
+    y_c = calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    v_2 = calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]
+    
+    ecu = Eq(Ec,y_c + v_2**2/(2*g))
     
     Ec = solve(ecu)
     
     return Ec
 
-def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
+def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
-    Q = Qfun(y1,b1,m1,m2,uni,uni2)
-    Ec = calculo_Ec(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2)[0]
+    """ Esta función retorna la nueva altura inicial del agua \n     
+    Parámetros:
+        Ec (symbol) variable que se quiere calcular
+        yin (symbol) variable que se requiere calcular
+        y1 (float) altura del agua de la sección 1
+        y2 (float) altura del agua de la sección 2
+        v1 (float) Velocidad de la sección 1
+        b1 (float) base del canal en la sección 1
+        b2 (float) base del canal en la sección 2
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        g (float) Aceleración gravitacional, generalmente 9.81 
+        uniy Unidades de la altura propiedades (mm,cm,m,in)
+        unib1 Unidades de la base1 propiedades (mm,cm,m,in)
+        unib2 Unidades de la base2 propiedades (mm,cm,m,in)
+        unim Unidades de inclinación (grados,radianes,m)
+    Retorna:
+        float: La velocidad del agua en la sección 2 [m]
+    """
+    
+    Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
+    Ec = calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]
 
     if m1 == 0 and m2 == 0:
         
@@ -327,7 +380,7 @@ def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
     
         yin = solve(ec1)  
     
-    if b == 0 and m1 != 0 and m2 != 0:
+    if b1 == 0 and m1 != 0 and m2 != 0:
         
         if m1 == m2:
                 
@@ -336,7 +389,7 @@ def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
             yin = solve(ec1)
                 
         else:
-            ec1 = Eq(Eq,yin+((Q**2)/(2*g*(m1*yin**2/2+b1*yin+m2*yin**2/2)**2)))
+            ec1 = Eq(Ec,yin+((Q**2)/(2*g*(m1*yin**2/2+b1*yin+m2*yin**2/2)**2)))
         
             yin = solve(ec1)
     i=0
@@ -351,26 +404,25 @@ def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
     return y
 
 
-def grafica4 (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
+def grafica4 (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
 
-    Q = Qfun(y1,b1,m1,m2,uni,uni2)
-    EqCri = Eq(m,(0-calculo_yc(yc,y1,b1,b2,m1,m2,g,uni,uni2))/(0-calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2)[0]))
+    Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
+    EqCri = Eq(m,(0-calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))/(0-calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]))
     m = solve(EqCri)
 
     x = np.linspace(0,10,50)
 
     yg = np.linspace(0.1,10,1000)
-    yg2 = np.linspace(0.4,10,1000)
     
-    E = yg + (Q**2/(2*g*(Area(yg,b1,m1,m2,uni,uni2))**2))
-    E2 = yg + (Q**2/(2*g*(Area(yg,b2,m1,m2,uni,uni2))**2))
+    E = yg + (Q**2/(2*g*(Area(yg,b1,m1,m2,uniy,unib1,unim))**2))
+    E2 = yg + (Q**2/(2*g*(Area(yg,b2,m1,m2,uniy,unib2,unim))**2))
     
 
     plt.style.use('ggplot')
     plt.plot(E,yg,label = 'S1')
     plt.plot(E2,yg,label = 'S2')
     plt.plot(x,x, label = 'E = y',linestyle='dashed')
-    if m1 != 0 and m2 != 0:
+    if m1 == 0 and m2 == 0:
         plt.plot(x,m*x,label = 'Ec = 3/2 yc', linestyle='dashed')
         
     plt.xlabel('E (m)')
@@ -381,28 +433,141 @@ def grafica4 (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
     plt.show()
 
 
-def imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uni,uni2):
-    
-    msg1 = '\nArea1 '+ str( Area(y1,b1,m1,m2,'m',''))
-    
-    msg2 = '\nCaudal '+ str(Qfun(y1,b1,m1,m2,'m',''))
-    
-    msg3 = '\nvalores de y2 '+ str(y2fun(y1,y2,v1,b1,b2,m1,m2,g,'m',''))
-    
-    msg4 = '\nvalor de yc'+ str(calculo_yc(yc,y1,b1,b2,m1,m2,g,'m',''))
-    
-    msg5 = '\nvalor de Ec'+ str(calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,'m',''))
+def grafica4_txt (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim,ruta):
 
-    msg6 = '\nvelocidad en 2 '+ str(calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,'m',''))   
+    """ Esta función retorna un txt para graficar la enerigía específica \n
+        según la sección transversal
+    Parametros:
+        v1 (float) velocidad de la sección 1 del canal
+        b (float) base del canal
+        y1 (float) altura del agua
+        m1 (float) Pendiente parte izquierda de un trapecio
+        m2 (float) Pendiente parte derecha de un trapecio
+        g (float) Aceleración gravitacional, generalmente 9.81 
+        unib Unidades de la base propiedades (mm,cm,m,in)
+        uniy Unidades de la altura propiedades (mm,cm,m,in)
+        unim Unidades de inclinación (grados,radianes,m)
+    Retorna:
+        txt: valores de x y y para graficar
+    """
     
-    msg7= '\nNuevo y1 '+ str( max(calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,'m','')))
+    x = np.linspace(0,10,10)
+    yg = np.linspace(0.2,10,300)     
+    Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
+    EqCri = Eq(m,(0-calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))/(0-calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]))
+    m = solve(EqCri)
+    
+    
+    
+    file = open(ruta, 'w')
    
-    grafica4(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,'m','')
+    file.write("S1\n")
+    for index in range(len(yg)):
+        
+        A1 = Area(yg[index],b1,m1,m2,uniy,unib1,unim)
+        
+        Ei1 = yg[index] + (Q)**2/(2*g*(A1)**2)  
+        
+        file.write(str(yg[index]) + ";" + str(Ei1) + "\n")
+        
+    
+    file.write("S2\n")
+    
+    for index in range(len(yg)):
+        
+        A2 = Area(yg[index],b2,m1,m2,uniy,unib2,unim)
+        
+        Ei2 = yg[index] + (Q)**2/(2*g*(A2)**2)  
+        
+        file.write(str(yg[index]) + ";" + str(Ei2) + "\n")
+    
+    file.write("Linea Recta\n")
+    
+    for index in range(len(x)):
+        
+        file.write(str(x[index]) + ";" + str(x[index]) + "\n")
+        
+    
+    if m1 == 0 and m2 == 0:
+        
+        file.write("Ec = 3/2 yc\n")
+    
+        for index in range(len(x)):
+        
+            file.write(str(x[index]) + ";" + str(x[index]*m[0]) + "\n")
+    
+    file.close()
+
+def imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+    
+    msg1 = '\nArea1 '+ str( Area(y1,b1,m1,m2,uniy,unib1,unim))
+    
+    msg2 = '\nCaudal '+ str(Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim))
+    
+    msg3 = '\nvalores de y2 '+ str(y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+    
+    msg4 = '\nvalor de yc'+ str(calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+    
+    msg5 = '\nvalor de Ec'+ str(calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+
+    msg6 = '\nvelocidad en 2 '+ str(calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))   
+    
+    msg7= '\nNuevo y1 '+ str( max(calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)))
+   
+    grafica4(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
     
     return msg1 + msg2 + msg3+ msg4+ msg5+ msg6+ msg7
     
-print(imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,'m',''))
 
+def valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+    
+    temp = ''
+    Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
+    b1 = cambio_unidades(unib1,b1)
+    b2 = cambio_unidades(unib2,b2)
+    m1 = cambio_angulo(unim,m1)
+    m2 = cambio_angulo(unim,m2)
+    y1 = cambio_unidades(uniy,y1) 
+    
+    A1 = Area(y1,b1,m1,m2,uniy,unib1,unim)
+    
+    QL = Q*1000
+    
+    y_2 = y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    
+    y_c = calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    
+    if y_2 == "Fenomeno de choque, se requiere calcular yc\n":
+        
+        y_c = calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    
+    A2 = float(solve(Eq(Q,calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]*At))[0])
+    
+    print(y1,A1, Q, QL, y_2,y_c,A2)
+    
+    return temp
+
+unib1 = 'm'
+unib2 = 'm'
+uniy = 'm'
+uniz1 = 'm'
+uniz2 = 'm'
+unim = ''
+ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/cambioenlabasedelcanal.txt'
+
+y1=3.8
+b1=16
+b2=10
+v1=1.05
+z1=0
+z2=0
+m1=0
+m2=0
+g=9.81
+
+print(imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+print(valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+print(grafica4_txt (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim, ruta))
 
 
 
