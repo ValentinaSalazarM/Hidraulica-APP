@@ -565,9 +565,9 @@ m1=0
 m2=0
 g=9.81
 
-print(imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
-print(valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
-print(grafica4_txt (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim, ruta))
+#print(imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+#print(valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+#print(grafica4_txt (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim, ruta))
 
 
 
