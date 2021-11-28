@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Sun Nov 28 09:38:10 2021
+
+@author: JFGJ
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Fri Sep 10 09:39:36 2021
 
 @author: JFGJ
@@ -12,12 +19,6 @@ from sympy import *
 y = symbols('y')
 
 
-Q = 375
-b = 20
-S = 0.7
-sigma = 1.1
-yn = 3.45
-g = 9.81
 
 def cambio_unidades(unidad,propiedad):
     
@@ -48,6 +49,30 @@ def cambio_unidades(unidad,propiedad):
         
     return temp 
 
+def cambio_angulo(unidad,propiedad):
+    
+    """ Esta realiza el cambio del angulo\n
+        
+    Parámetros:
+        unidad (string) Puede ser grados o pendiente. 
+        propiedad (float) Valor del angulo.
+    Retorna:
+        float: Retorna el angulo en pendiente (m).
+    """
+    
+    if unidad == 'grados':
+        
+        temp = 1/np.tan(np.pi/180*propiedad)
+        
+    if unidad == 'radianes':
+        
+        temp = 1/np.tan(propiedad)
+    
+    else:
+        temp = propiedad
+        
+    return temp
+
 def cambio_unidades_Caudal(unidad,caudal):
     
     """ Esta realiza el cambio de unidades del caudal\n
@@ -58,38 +83,75 @@ def cambio_unidades_Caudal(unidad,caudal):
         float: Retorna la propiedad en metros.
     """
     
-    if unidad == 'm^3/s':
-        
-        temp = caudal
-    
-    if unidad == 'l/s':
+    if unidad == 'L':
         
         temp = caudal/1000
-
+    else:
+        temp = caudal
+        
     return temp
 
-def Energia_Inicial (yo, delta_y,uni):
+def Energia_Inicial (yo, delta_y,uniy,unidy):
     
-    yo = cambio_unidades(uni,yo)
-    delta_y = cambio_unidades(uni,delta_y)
+    """ Calcula la energía inical\n
+    Parámetros:
+        yo (float) altura inicial 
+        delta_y (float) diferencia en la altura inicial y el fondo de la piscina
+        uniy unidades de la altura inicial (mm,cm,m,in)
+        unidy unidades de delta y (mm,cm,m,in)
+    Retorna:
+        float: Energía inicial.
+    """
+    
+    yo = cambio_unidades(uniy,yo)
+    delta_y = cambio_unidades(unidy,delta_y)
     
     Eo = yo + delta_y
     
     return Eo 
 
-def Caudal_base(Q,b,uni,uni2):
+def Caudal_base(Q,b,unib,uniQ):
     
-    Q = cambio_unidades_Caudal(uni2,Q)
-    b = cambio_unidades(uni,b)
+    """ Calcula el caudal divido por la base\n
+    Parámetros:
+        Q (float) Caudal.
+        b (float) base del canal
+        unib unidades de la base del canal (mm,cm,m,in)
+        uniQ unidades de del caudal (m3,L)
+    Retorna:
+        float: Caudal divido por la base.
+    """
+    
+    Q = cambio_unidades_Caudal(uniQ,Q)
+    b = cambio_unidades(unib,b)
     
     q = Q/b
     
     return q
 
-def y1(y,yo,delta_y,Q,b,g,S,uni,uni2):
+def y1(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
-    E = Energia_Inicial(yo,delta_y,uni)
-    q = Caudal_base(Q,b,uni,uni2)
+    """ Calcula la altura al final de la caída\n
+    Parámetros:
+        y (symbol) altura que se desea calcular.
+        yo (float) altura inicial
+        delta_y (float) diferencia en la altura inicial y el fondo de la piscina
+        Q (float) Caudal.
+        b (float) base del canal
+        g (float) aceleración gravitacional, usualmente 9.81      
+        S (float) inclinación de la caída.
+        uniy unidades de la altura inicial (mm,cm,m,in)
+        unidy unidades de delta y (mm,cm,m,in)
+        uniQ unidades de del caudal (m3,L)
+        unib unidades de la base del canal (mm,cm,m,in)
+        uniS unidades de la inclinación (grados,radianes,m)
+    Retorna:
+        float: altura al final de la caída.
+    """
+    
+    E = Energia_Inicial(yo,delta_y,uniy,unidy)
+    q = Caudal_base(Q,b,unib,uniQ)
+    S = cambio_angulo(uniS,S)   
     
     ecu = Eq(E,y+q**2/(2*g*y**2*S**2))
     
@@ -97,10 +159,28 @@ def y1(y,yo,delta_y,Q,b,g,S,uni,uni2):
     
     return y1
 
-def yo(y,yo,delta_y,Q,b,g,S,uni,uni2):
+def yo(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
-    E = Energia_Inicial(yo,delta_y,uni)
-    q = Caudal_base(Q,b,uni,uni2)
+    """ Calcula la altura inicial\n
+    Parámetros:
+        y (symbol) altura que se desea calcular.
+        yo (float) altura inicial
+        delta_y (float) diferencia en la altura inicial y el fondo de la piscina
+        Q (float) Caudal.
+        b (float) base del canal
+        g (float) aceleración gravitacional, usualmente 9.81      
+        S (float) inclinación de la caída.
+        uniy unidades de la altura inicial (mm,cm,m,in)
+        unidy unidades de delta y (mm,cm,m,in)
+        uniQ unidades de del caudal (m3,L)
+        unib unidades de la base del canal (mm,cm,m,in)
+        uniS unidades de la inclinación (grados,radianes,m)
+    Retorna:
+        float: altura inicial.
+    """
+    E = Energia_Inicial(yo,delta_y,uniy,unidy)
+    q = Caudal_base(Q,b,unib,uniQ)
+    S = cambio_angulo(uniS,S)   
     
     ecu = Eq(E,y+q**2/(2*g*y**2*S**2))
     
@@ -108,10 +188,28 @@ def yo(y,yo,delta_y,Q,b,g,S,uni,uni2):
     
     return yo
 
-def y2(y,yo,delta_y,Q,b,g,S,uni,uni2):
+def y2(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
-    y1_temp = y1(y,yo,delta_y,Q,b,g,S,uni,uni2)
-    q = Caudal_base(Q,b,uni,uni2)
+    """ Calcula y2\n
+    Parámetros:
+        y (symbol) altura que se desea calcular.
+        yo (float) altura inicial
+        delta_y (float) diferencia en la altura inicial y el fondo de la piscina
+        Q (float) Caudal.
+        b (float) base del canal
+        g (float) aceleración gravitacional, usualmente 9.81      
+        S (float) inclinación de la caída.
+        uniy unidades de la altura inicial (mm,cm,m,in)
+        unidy unidades de delta y (mm,cm,m,in)
+        uniQ unidades de del caudal (m3,L)
+        unib unidades de la base del canal (mm,cm,m,in)
+        uniS unidades de la inclinación (grados,radianes,m)
+    Retorna:
+        float: y2.
+    """
+    
+    y1_temp = y1(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS)
+    q = Caudal_base(Q,b,unib,uniQ)
     
     ecu = Eq(y,(y1_temp/2)*(sqrt(1+8*(q**2/(g*y1_temp**3)))-1))
     
@@ -120,28 +218,71 @@ def y2(y,yo,delta_y,Q,b,g,S,uni,uni2):
     return round(y2_temp,3)
 
 
-def delta_y_i(sigma,yn,y,yo,delta_y,Q,b,g,S,uni,uni2):
+def delta_y_i(sigma,yn,y,yo,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS):
     
-    y2_temp = y2(y,yo,delta_y,Q,b,g,S,uni,uni2)
+    """ Calcula delta y en cada iteración\n
+    Parámetros:
+        sigma (float) sigma elegido por el usuario.
+        yn (float) altura normal.
+        y (symbol) altura que se desea calcular.
+        yo (float) altura inicial
+        delta_y (float) diferencia en la altura inicial y el fondo de la piscina
+        Q (float) Caudal.
+        b (float) base del canal
+        g (float) aceleración gravitacional, usualmente 9.81      
+        S (float) inclinación de la caída.
+        uniyn unidades de la altura normal (mm,cm,m,in)
+        uniy unidades de la altura inicial (mm,cm,m,in)
+        unidy unidades de delta y (mm,cm,m,in)
+        uniQ unidades de del caudal (m3,L)
+        unib unidades de la base del canal (mm,cm,m,in)
+        uniS unidades de la inclinación (grados,radianes,m)
+    Retorna:
+        float: y2.
+    """
+    yn = cambio_unidades(uniyn,yn)
+    
+    y2_temp = y2(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS)
     
     delta_y_temp = sigma*y2_temp - yn
     
     return delta_y_temp
     
-def ciclo_Fr(sigma, yn, y, yo, delta_y, Q, b, g, S, uni, uni2):
+def ciclo_Fr(sigma, yn, y, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS):
     
-    Q = cambio_unidades_Caudal(uni2,Q)
-    b = cambio_unidades(uni,b)
+    """ Realiza las iteraciones necesarias para calcular el tipo de piscina\n
+    Parámetros:
+        sigma (float) sigma elegido por el usuario.
+        yn (float) altura normal.
+        y (symbol) altura que se desea calcular.
+        yo (float) altura inicial
+        delta_y (float) diferencia en la altura inicial y el fondo de la piscina
+        Q (float) Caudal.
+        b (float) base del canal
+        g (float) aceleración gravitacional, usualmente 9.81      
+        S (float) inclinación de la caída.
+        uniyn unidades de la altura normal (mm,cm,m,in)
+        uniy unidades de la altura inicial (mm,cm,m,in)
+        unidy unidades de delta y (mm,cm,m,in)
+        uniQ unidades de del caudal (m3,L)
+        unib unidades de la base del canal (mm,cm,m,in)
+        uniS unidades de la inclinación (grados,radianes,m)
+    Retorna:
+        list: delta y, Energia inicial, y1, y2, delta y i+1, error, velocidad, froude y tipo de piscina.
+    """
+    
+    Q = cambio_unidades_Caudal(uniQ,Q)
+    b = cambio_unidades(unib,b)
     
     delta_y = 0
     centineta = False
     
     while centineta == False:
         
-        E = Energia_Inicial(yo, delta_y, uni)
-        y1_temp = y1(y, yo, delta_y, Q, b, g, S, uni, uni2)
-        y2_temp = y2(y, yo, delta_y, Q, b, g, S, uni, uni2)
-        delta_y_i_temp = delta_y_i(sigma, yn, y, yo, delta_y, Q, b, g, S, uni, uni2)
+        E = Energia_Inicial(yo, delta_y, uniy,unidy)
+        y1_temp = y1(y, yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
+        y2_temp = y2(y, yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
+        delta_y_i_temp = delta_y_i(sigma, yn, y, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS)
         er = abs(delta_y-delta_y_i_temp)
         delta_y = delta_y + er
         
@@ -169,14 +310,25 @@ def ciclo_Fr(sigma, yn, y, yo, delta_y, Q, b, g, S, uni, uni2):
         
         msg = "Tipo II"
     
-    return round(Fr1,3),msg
+    return delta_y,E,y1_temp,y2_temp,delta_y_i_temp,er,v1,round(Fr1,3),msg
 
+uniy='m'
+unidy='m'
+uniQ='m3'
+unib='m'
+uniS='m'
+uniyn='m'
 
+Q = 375
+b = 20
+S = 0.7
+sigma = 1.1
+yn = 3.45
+g = 9.81
+yos=21
+delta_y=0
 
-#print(y2(y,21,0,375,20,9.81,0.7,'m','m^3/s'))
-#print(delta_y_i(sigma,yn,y,21,0,375,20,9.81,0.7,'m','m^3/s'))
-#print(ciclo_Fr(sigma,yn,y,21,0,375,20,9.81,0.7,'m','m^3/s'))
-
+print(ciclo_Fr(sigma,yn,y,yos,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS))
 
 
 
