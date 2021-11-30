@@ -133,9 +133,10 @@ def Qd (Cd, Qmax,b,unib,uniQ):
     return Qd1,Qd2
 
 
-def Geo(Cd, Qmax,b,unib,uniQ,uniNME):
+def Geo(NME,Cd, Qmax,b,unib,uniQ,uniNME):
     ''' Calcula el caudal de diseño\n
     Parámetros:
+        NME (float) Nivel máximo del embalse. 
         Cd (float) Coeficiente de descarga.
         Qmax (float) Caudal máximo. 
         b (float) base. 
@@ -178,7 +179,7 @@ b = 45
 
 Cd = 2.82 
 
-print(Geo(Cd,Qmax,b,unib,uniQ,uniNME))
+print(Geo(NME,Cd,Qmax,b,unib,uniQ,uniNME))
 
 
 

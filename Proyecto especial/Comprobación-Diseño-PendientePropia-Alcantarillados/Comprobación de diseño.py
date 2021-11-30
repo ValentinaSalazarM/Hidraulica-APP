@@ -7,7 +7,10 @@ Created on Thu Sep  2 22:18:04 2021
 ##Comprobación de diseño
 
 import numpy as np
+import sympy as sp
+from sympy import *
 
+Sct = symbols('Sct')
 
 ## Funciones para el desarrollo 
 
@@ -292,6 +295,20 @@ def Fr (d, Ryd, So, ks, vi, g,unid,uniks,uniS):
     
     return F, FT
 
+def pendiente_critica_manning(Sct, d, n, g, Ryd, unid):
+    
+    
+    d = cambio_unidades(unid,d)
+    
+    R = Ra(d, Ryd, unid)
+    A = Area(d, Ryd, unid)
+    
+    Sc = Eq(1,(1/n)*(R**(2/3))*(Sct**(1/2))/np.sqrt(g*D(d, Ryd, unid)))
+    
+    Sc = solve(Sc)
+    
+    return Sc
+    
 
 def comprobacion_manning(d,Ryd,So,g,n,unid,uniS):
     
@@ -311,6 +328,8 @@ def comprobacion_manning(d,Ryd,So,g,n,unid,uniS):
     
     So = cambio_angulo(uniS,So)
     d = cambio_unidades(unid,d)
+    Sc = pendiente_critica_manning(Sct, d, n, g, Ryd, unid)
+    
     
     R = Ra(d, Ryd, unid)
     A = Area(d, Ryd, unid)
@@ -333,7 +352,7 @@ def comprobacion_manning(d,Ryd,So,g,n,unid,uniS):
         
         FT = "Crítico"
     
-    return Q,Fr,FT
+    return Q,Fr,FT,v,Sc
 
 
 def valores_Darcy(d, Ryd, So, ks, vi, g,unid,uniks,uniS):
@@ -355,8 +374,9 @@ def valores_Darcy(d, Ryd, So, ks, vi, g,unid,uniks,uniS):
     """
     F = Fr(d, Ryd, So, ks, vi, g,unid,uniks,uniS)
     Q = CauL(d, Ryd, So, ks, vi, g, unid, uniks, uniS)
+    v= velo(d, Ryd, So, ks, vi, g, unid, uniks, uniS)
     
-    return Q,F
+    return Q,F,v
     
 
 g = 9.81
@@ -370,7 +390,7 @@ unid='m'
 uniks='m'
 uniS='m'
 
-
+print(pendiente_critica_manning(Sct, d, n, g, Ryd, unid))
 print(comprobacion_manning(d,Ryd,So,g,n,unid,uniS))
 print (valores_Darcy(d, Ryd, So, ks, vi, g,unid,uniks,uniS))
 
