@@ -9,9 +9,9 @@ import numpy as np
 import sympy as sp
 from matplotlib import pyplot as plt
 from sympy import *
-yin, m, yc, Ec, y2, v2, At= symbols('yin m yc Ec y2 v2 At')
 
-##Desarrollo para cambio en la base del canal, parámetros b,y1,v1,z1,z2
+
+##Desarrollo para cambio en la base del canal, parámetros b,y1,v1
 '-----------------------------------------------------------------------------'
 '-----------------------------------------------------------------------------'
 
@@ -169,12 +169,11 @@ def Qfun(v1,y,b,m1,m2,uniy,unib,unim):
     return Q
 
 
-def y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+def y2fun(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
     """ Esta función retorna la altura del agua en la sección dos\n
     Parámetros:
         y1 (float) altura del agua de la sección 1
-        y2 (symbol) variable que se quiere calcular
         v1 (float) Velocidad de la sección 1
         b1 (float) base del canal en la sección 1
         b2 (float) base del canal en la sección 2
@@ -188,6 +187,8 @@ def y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     Retorna:
         float: La altura del agua en la sección 2 [m]
     """
+    y2 = symbols('y2')
+    
     y1 = cambio_unidades(uniy,y1)
     b1 = cambio_unidades(unib1,b1)
     b2 = cambio_unidades(unib2,b2)
@@ -235,12 +236,11 @@ def y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
 
 
 
-def calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+def calculo_yc(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
     """ Esta función retorna la altura crítica del agua\n
         
     Parámetros:
-        yc (symbol) variable que se quiere calcular
         y1 (float) altura del agua de la sección 1
         v1 (float) Velocidad de la sección 1
         b1 (float) base del canal en la sección 1
@@ -256,6 +256,8 @@ def calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
         float: La altura crítica del agua [m]
     """
     
+    yc = symbols('yc')
+    
     Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
     
     A = Area(yc,b2,m1,m2,uniy,unib2,unim)
@@ -270,12 +272,11 @@ def calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
 
 
 
-def calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+def calculo_v2(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
     """ Esta función retorna la velocidad del agua en la sección dos\n     
     Parámetros:
         y1 (float) altura del agua de la sección 1
-        y2 (symbol) variable que se quiere calcular
         v1 (float) Velocidad de la sección 1
         b1 (float) base del canal en la sección 1
         b2 (float) base del canal en la sección 2
@@ -290,12 +291,14 @@ def calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
         float: La velocidad del agua en la sección 2 [m]
     """
     
-    y_2 = y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    v2 = symbols('v2')
+    
+    y_2 = y2fun(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
     Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
     
     if y_2 == "Fenomeno de choque, se requiere calcular yc\n":
         
-        y_c = calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+        y_c = calculo_yc(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
         A = Area(y_c,b2,m1,m2,uniy,unib2,unim)
         
         ecu = Eq(Q,v2*A)
@@ -318,12 +321,10 @@ def calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     return v
 
 
-def calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+def calculo_Ec(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
 
     """ Esta función retorna la velocidad del agua en la sección dos\n     
     Parámetros:
-        Ec (symbol) variable que se quiere calcular
-        yc (float) altura critica del agua
         y1 (float) altura del agua de la sección 1
         y2 (float) altura del agua de la sección 2
         v1 (float) Velocidad de la sección 1
@@ -340,8 +341,10 @@ def calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
         float: La velocidad del agua en la sección 2 [m]
     """
     
-    y_c = calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
-    v_2 = calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]
+    Ec = symbols('Ec')
+    
+    y_c = calculo_yc(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    v_2 = calculo_v2(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]
     
     ecu = Eq(Ec,y_c + v_2**2/(2*g))
     
@@ -349,14 +352,11 @@ def calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
     return Ec
 
-def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+def calculo_yin(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
     """ Esta función retorna la nueva altura inicial del agua \n     
     Parámetros:
-        Ec (symbol) variable que se quiere calcular
-        yin (symbol) variable que se requiere calcular
         y1 (float) altura del agua de la sección 1
-        y2 (float) altura del agua de la sección 2
         v1 (float) Velocidad de la sección 1
         b1 (float) base del canal en la sección 1
         b2 (float) base del canal en la sección 2
@@ -370,9 +370,11 @@ def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     Retorna:
         float: La velocidad del agua en la sección 2 [m]
     """
+    Ec = symbols('Ec')
+    yin = symbols('yin')
     
     Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
-    Ec = calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]
+    Ec = calculo_Ec(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]
 
     if m1 == 0 and m2 == 0:
         
@@ -404,10 +406,12 @@ def calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     return y
 
 
-def grafica4 (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+def grafica4 (y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
 
+    m = symbols('m')
+    
     Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
-    EqCri = Eq(m,(0-calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))/(0-calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]))
+    EqCri = Eq(m,(0-calculo_yc(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))/(0-calculo_Ec(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]))
     m = solve(EqCri)
 
     x = np.linspace(0,10,50)
@@ -433,7 +437,7 @@ def grafica4 (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     plt.show()
 
 
-def grafica4_txt (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim,ruta):
+def grafica4_txt (y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim,ruta):
 
     """ Esta función retorna un txt para graficar la enerigía específica \n
         según la sección transversal
@@ -450,11 +454,12 @@ def grafica4_txt (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim,ruta):
     Retorna:
         txt: valores de x y y para graficar
     """
+    m = symbols('m')
     
     x = np.linspace(0,10,10)
     yg = np.linspace(0.2,10,300)     
     Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
-    EqCri = Eq(m,(0-calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))/(0-calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]))
+    EqCri = Eq(m,(0-calculo_yc(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))/(0-calculo_Ec(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]))
     m = solve(EqCri)
     
     
@@ -498,28 +503,32 @@ def grafica4_txt (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim,ruta):
     
     file.close()
 
-def imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+def imprimir_valores(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+    
+    m = symbols('m')
     
     msg1 = '\nArea1 '+ str( Area(y1,b1,m1,m2,uniy,unib1,unim))
     
     msg2 = '\nCaudal '+ str(Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim))
     
-    msg3 = '\nvalores de y2 '+ str(y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+    msg3 = '\nvalores de y2 '+ str(y2fun(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
     
-    msg4 = '\nvalor de yc'+ str(calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+    msg4 = '\nvalor de yc'+ str(calculo_yc(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
     
-    msg5 = '\nvalor de Ec'+ str(calculo_Ec(Ec,yc,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+    msg5 = '\nvalor de Ec'+ str(calculo_Ec(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
 
-    msg6 = '\nvelocidad en 2 '+ str(calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))   
+    msg6 = '\nvelocidad en 2 '+ str(calculo_v2(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))   
     
-    msg7= '\nNuevo y1 '+ str( max(calculo_yin(Ec,yin,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)))
+    msg7= '\nNuevo y1 '+ str( max(calculo_yin(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)))
    
-    grafica4(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    grafica4(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
     
     return msg1 + msg2 + msg3+ msg4+ msg5+ msg6+ msg7
     
 
-def valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+def valores(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
+    
+    At = symbols('At')
     
     temp = ''
     Q = Qfun(v1,y1,b1,m1,m2,uniy,unib1,unim)
@@ -533,15 +542,15 @@ def valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
     
     QL = Q*1000
     
-    y_2 = y2fun(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    y_2 = y2fun(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
     
-    y_c = calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+    y_c = calculo_yc(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
     
     if y_2 == "Fenomeno de choque, se requiere calcular yc\n":
         
-        y_c = calculo_yc(yc,y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
+        y_c = calculo_yc(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)
     
-    A2 = float(solve(Eq(Q,calculo_v2(y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]*At))[0])
+    A2 = float(solve(Eq(Q,calculo_v2(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim)[0]*At))[0])
     
     print(y1,A1, Q, QL, y_2,y_c,A2)
     
@@ -550,24 +559,20 @@ def valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim):
 unib1 = 'm'
 unib2 = 'm'
 uniy = 'm'
-uniz1 = 'm'
-uniz2 = 'm'
 unim = ''
-ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/cambioenlabasedelcanal.txt'
+ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/cambioenlabasedelcanal.cvs'
 
 y1=3.8
 b1=16
 b2=10
 v1=1.05
-z1=0
-z2=0
 m1=0
 m2=0
 g=9.81
 
-#print(imprimir_valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
-#print(valores(Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
-#print(grafica4_txt (Ec,yc,m,y1,y2,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim, ruta))
+print(imprimir_valores(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+print(valores(y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim))
+print(grafica4_txt (y1,v1,b1,b2,m1,m2,g,uniy,unib1,unib2,unim, ruta))
 
 
 

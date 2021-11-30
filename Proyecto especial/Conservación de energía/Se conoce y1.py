@@ -10,12 +10,8 @@ import sympy as sp
 from sympy import *
 from matplotlib import pyplot as plt
 
-'1/tan30 = 1.73205'
-'1/tan60 = 0.57735'
-
 'Variables para la solución del problema'
 
-y2, y = symbols('y2 y')
 
 ##Desarrollo para cuando se conoce y1, parámetros b,y1,v1,z1,z2
 '-----------------------------------------------------------------------------'
@@ -161,12 +157,11 @@ def Q_en_litros(v1,b,y,m1,m2,unib,uniy,unim):
 
 
 
-def y2fun(y2,b,y1,m1,m2,v1,z1,z2,g,unib,uniy,unim,uniz1,uniz2):
+def y2fun(b,y1,m1,m2,v1,z1,z2,g,unib,uniy,unim,uniz1,uniz2):
     
     """ Esta función retorna la altura del agua en la sección dos\n
         
     Parámetros:
-        y2 (symbol) variable que se quiere calcular
         b (float) base del canal
         y1 (float) altura del agua en la sección 1
         m1 (float) Pendiente parte izquierda de un trapecio
@@ -183,6 +178,8 @@ def y2fun(y2,b,y1,m1,m2,v1,z1,z2,g,unib,uniy,unim,uniz1,uniz2):
     Retorna:
         List: los valores de las alturas del agua en la sección 2 [m]
     """
+    
+    y2 = symbols('y2')
     b = cambio_unidades(unib,b)
     y1 = cambio_unidades(uniy,y1)
     m1 = cambio_angulo(unim,m1)
@@ -219,11 +216,10 @@ def y2fun(y2,b,y1,m1,m2,v1,z1,z2,g,unib,uniy,unim,uniz1,uniz2):
     
     return y2 
 
-def y2_final_valor(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
+def y2_final_valor(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
     
     """ Esta función retorna la altura del agua en la sección dos\n    
     Parámetros:
-        y2 (symbol) variable que se quiere calcular
         b (float) base del canal
         y1 (float) altura del agua en la sección 1
         m1 (float) Pendiente parte izquierda de un trapecio
@@ -240,7 +236,9 @@ def y2_final_valor(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, un
     Retorna:
         float: La altura del agua en la sección 2 [m]
     """
-    yf = y2fun(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2)
+    
+    y2 = symbols('y2')
+    yf = y2fun(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2)
     temp = ''
     i=0
     y =[]
@@ -296,7 +294,7 @@ def grafica2 (v1,b,y,m1,m2,g,unib,uniy,unim):
     plt.show()
 
     
-def grafica2_txt (v1,b,y,m1,m2,g,unib,uniy,unim, ruta):
+def grafica2_txt (v1,b,m1,m2,g,unib,uniy,unim, ruta):
 
     """ Esta función retorna un txt para graficar la enerigía específica \n
         según la sección transversal
@@ -339,7 +337,7 @@ def grafica2_txt (v1,b,y,m1,m2,g,unib,uniy,unim, ruta):
     
     
 
-def imprimir_valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
+def imprimir_valores(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
     
     """ Esta función retorna los valores del caudal, el área y la gráfica
     Retorna:
@@ -355,7 +353,7 @@ def imprimir_valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, 
     m2 = cambio_angulo(unim,m2)
     
     grafica2(v1, b, y1, m1, m2, g, unib, uniy, unim)
-    yf = y2fun(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2)
+    yf = y2fun(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2)
     
     i=0
     y =[]
@@ -373,8 +371,8 @@ def imprimir_valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, 
         msg2 = '\nEl área transversal 2 es: '+str(round(Area(b, y[2], m1, m2, unib, uniy, unim),3)) 
     
     msg3 = '\nEl cuadal [l/s] es:'+str(round(Q_en_litros(v1, b, y1, m1, m2, unib, uniy, unim),4)) 
-    msg4 = '\nLos valores de y2 son: '+ str(y2fun(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
-    msg5 = '\nEl valor final de y2 es: '+ str(y2_final_valor(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
+    msg4 = '\nLos valores de y2 son: '+ str(y2fun(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
+    msg5 = '\nEl valor final de y2 es: '+ str(y2_final_valor(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
     
     
     temp = msg1 +msg2 + msg3 +msg4 +msg5
@@ -382,7 +380,7 @@ def imprimir_valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, 
     return temp
 
 
-def valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
+def valores(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
     
    
     temp = ''
@@ -400,9 +398,9 @@ def valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
     
     QL = Q_en_litros(v1,b,y1,m1,m2,unib,uniy,unim)
     
-    y_2 = y2fun(y2,b,y1,m1,m2,v1,z1,z2,g,unib,uniy,unim,uniz1,uniz2)
+    y_2 = y2fun(b,y1,m1,m2,v1,z1,z2,g,unib,uniy,unim,uniz1,uniz2)
     
-    y_2_final = y2_final_valor(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2)
+    y_2_final = y2_final_valor(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2)
     
     A2 = Area(b,y_2_final,m1,m2,unib,uniy,unim)
     
@@ -415,7 +413,7 @@ uniy = 'm'
 uniz1 = 'm'
 uniz2 = 'm'
 unim = ''
-ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/seconocey1.txt'
+ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/seconocey1.cvs'
 
 b=10
 y1=4.5
@@ -427,9 +425,9 @@ m2=0
 g = 9.81
 
 
-#print(imprimir_valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
-#print(valores(y2, b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
-print(grafica2_txt (v1,b,y,m1,m2,g,unib,uniy,unim, ruta))
+print(imprimir_valores( b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
+print(valores(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
+print(grafica2_txt (v1,b,m1,m2,g,unib,uniy,unim, ruta))
 
 
 

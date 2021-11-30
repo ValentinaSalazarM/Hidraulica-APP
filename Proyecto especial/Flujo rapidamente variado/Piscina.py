@@ -16,10 +16,6 @@ import numpy as np
 import sympy as sp
 from sympy import *
 
-y = symbols('y')
-
-
-
 def cambio_unidades(unidad,propiedad):
     
     """ Esta realiza el cambio de unidades para las propiedades de la figura\n
@@ -129,11 +125,10 @@ def Caudal_base(Q,b,unib,uniQ):
     
     return q
 
-def y1(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
+def y1(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
     """ Calcula la altura al final de la caída\n
     Parámetros:
-        y (symbol) altura que se desea calcular.
         yo (float) altura inicial
         delta_y (float) diferencia en la altura inicial y el fondo de la piscina
         Q (float) Caudal.
@@ -148,7 +143,8 @@ def y1(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     Retorna:
         float: altura al final de la caída.
     """
-    
+    y = symbols('y')
+
     E = Energia_Inicial(yo,delta_y,uniy,unidy)
     q = Caudal_base(Q,b,unib,uniQ)
     S = cambio_angulo(uniS,S)   
@@ -159,11 +155,10 @@ def y1(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
     return y1
 
-def yo(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
+def yo(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
     """ Calcula la altura inicial\n
     Parámetros:
-        y (symbol) altura que se desea calcular.
         yo (float) altura inicial
         delta_y (float) diferencia en la altura inicial y el fondo de la piscina
         Q (float) Caudal.
@@ -178,6 +173,8 @@ def yo(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     Retorna:
         float: altura inicial.
     """
+    y = symbols('y')
+
     E = Energia_Inicial(yo,delta_y,uniy,unidy)
     q = Caudal_base(Q,b,unib,uniQ)
     S = cambio_angulo(uniS,S)   
@@ -188,11 +185,10 @@ def yo(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
     return yo
 
-def y2(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
+def y2(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
     """ Calcula y2\n
     Parámetros:
-        y (symbol) altura que se desea calcular.
         yo (float) altura inicial
         delta_y (float) diferencia en la altura inicial y el fondo de la piscina
         Q (float) Caudal.
@@ -207,8 +203,9 @@ def y2(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     Retorna:
         float: y2.
     """
-    
-    y1_temp = y1(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS)
+    y = symbols('y')
+
+    y1_temp = y1(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS)
     q = Caudal_base(Q,b,unib,uniQ)
     
     ecu = Eq(y,(y1_temp/2)*(sqrt(1+8*(q**2/(g*y1_temp**3)))-1))
@@ -218,13 +215,12 @@ def y2(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     return round(y2_temp,3)
 
 
-def delta_y_i(sigma,yn,y,yo,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS):
+def delta_y_i(sigma,yn,yo,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS):
     
     """ Calcula delta y en cada iteración\n
     Parámetros:
         sigma (float) sigma elegido por el usuario.
         yn (float) altura normal.
-        y (symbol) altura que se desea calcular.
         yo (float) altura inicial
         delta_y (float) diferencia en la altura inicial y el fondo de la piscina
         Q (float) Caudal.
@@ -240,21 +236,22 @@ def delta_y_i(sigma,yn,y,yo,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS):
     Retorna:
         float: y2.
     """
+    y = symbols('y')
+
     yn = cambio_unidades(uniyn,yn)
     
-    y2_temp = y2(y,yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS)
+    y2_temp = y2(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS)
     
     delta_y_temp = sigma*y2_temp - yn
     
     return delta_y_temp
     
-def ciclo_Fr(sigma, yn, y, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS):
+def ciclo_Fr(sigma, yn, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS):
     
     """ Realiza las iteraciones necesarias para calcular el tipo de piscina\n
     Parámetros:
         sigma (float) sigma elegido por el usuario.
         yn (float) altura normal.
-        y (symbol) altura que se desea calcular.
         yo (float) altura inicial
         delta_y (float) diferencia en la altura inicial y el fondo de la piscina
         Q (float) Caudal.
@@ -280,9 +277,9 @@ def ciclo_Fr(sigma, yn, y, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,un
     while centineta == False:
         
         E = Energia_Inicial(yo, delta_y, uniy,unidy)
-        y1_temp = y1(y, yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
-        y2_temp = y2(y, yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
-        delta_y_i_temp = delta_y_i(sigma, yn, y, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS)
+        y1_temp = y1(yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
+        y2_temp = y2(yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
+        delta_y_i_temp = delta_y_i(sigma, yn, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS)
         er = abs(delta_y-delta_y_i_temp)
         delta_y = delta_y + er
         
@@ -328,7 +325,7 @@ g = 9.81
 yos=21
 delta_y=0
 
-print(ciclo_Fr(sigma,yn,y,yos,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS))
+print(ciclo_Fr(sigma,yn,yos,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS))
 
 
 

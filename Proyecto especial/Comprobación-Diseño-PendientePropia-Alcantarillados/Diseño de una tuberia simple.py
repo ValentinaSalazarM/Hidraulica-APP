@@ -17,7 +17,6 @@ import numpy as np
 import sympy as sp
 import math as mt 
 from sympy import *
-yn = symbols('yn')
 
 
 def cambio_angulo(unidad,propiedad):
@@ -400,7 +399,7 @@ So = 0.01
 
 Ryd = 85
 
-#d = [0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1, 1.1]
+d = [0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1, 1.1]
 #d = [0.25, 0.3, 0.35]
 unid='m'
 uniks='m'

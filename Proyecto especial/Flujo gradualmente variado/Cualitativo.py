@@ -9,8 +9,6 @@ import numpy as np
 import sympy as sp
 from sympy import *
 
-ys= symbols('ys')
-
 def cambio_unidades(unidad,propiedad):
     
     """ Esta realiza el cambio de unidades para las propiedades de la figura\n
@@ -110,7 +108,6 @@ def Area(y,b,m1,m2,uni,uni2):
             
     return A
 
-print(Area(ys, 0, 50, 0, 'm', 'grados'))
 
 def Perimetro(y,b,m1,m2,uni,uni2):
     """ Esta función retorna el perimetro de la sección transversal\n
@@ -150,7 +147,6 @@ def Perimetro(y,b,m1,m2,uni,uni2):
     
     return P
 
-print(Perimetro(ys, 0, 50, 0, 'm', 'grados'))
 
 def T(y,b,m1,m2,uni,uni2):
     
@@ -193,7 +189,9 @@ def T(y,b,m1,m2,uni,uni2):
 
     return T
 
-def yc(Q,g,y,b,m1,m2,uni,uni2):
+def yc(Q,g,b,m1,m2,uni,uni2):
+    
+    ys= symbols('ys')
     
     centinela = False
     
@@ -214,9 +212,12 @@ def yc(Q,g,y,b,m1,m2,uni,uni2):
     return yc
     
 
-def yn (n,Q,S,y,b,m1,m2,uni,uni2):
+def yn (n,Q,S,b,m1,m2,uni,uni2):
+    
+    ys= symbols('ys')
     
     temp = n*Q/sqrt(S)
+    
     
     temp2 = Eq(temp, Area(ys,b,m1,m2,uni,uni2)**(5/3)/Perimetro(ys,b,m1,m2,uni,uni2)**(2/3))
     
@@ -240,10 +241,10 @@ def yn (n,Q,S,y,b,m1,m2,uni,uni2):
                    
     return yn
 
-def TipoSeccion(n,Q,S,g,y,b,m1,m2,uni,uni2):
+def TipoSeccion(n,Q,S,g,b,m1,m2,uni,uni2):
     
-    yc1 = yc(Q,g,y,b,m1,m2,uni,uni2)
-    yn1 = yn (n,Q,S,y,b,m1,m2,uni,uni2)
+    yc1 = yc(Q,g,b,m1,m2,uni,uni2)
+    yn1 = yn (n,Q,S,b,m1,m2,uni,uni2)
     
     if S == 0:
     
@@ -276,11 +277,12 @@ def abrir_imagen(im):
     im = Image.open(ruta)
     im.show()
 
-def tipoZona (yin, n, Q, S, g, y, b, m1, m2, uni, uni2):
+def tipoZona (yin, n, Q, S, g, b, m1, m2, uni, uni2):
     
-    yc1 = yc(Q,g,y,b,m1,m2,uni,uni2)
-    yn1 = yn (n,Q,S,y,b,m1,m2,uni,uni2)    
-    msg = TipoSeccion(n, Q, S, g, y, b, m1, m2, uni, uni2)
+    
+    yc1 = yc(Q,g,b,m1,m2,uni,uni2)
+    yn1 = yn (n,Q,S,b,m1,m2,uni,uni2)    
+    msg = TipoSeccion(n, Q, S, g, b, m1, m2, uni, uni2)
         
     
     if msg == 'Suave':
@@ -351,13 +353,13 @@ def tipoZona (yin, n, Q, S, g, y, b, m1, m2, uni, uni2):
 
 
 
-print('yc ,',yc(74.3, 9.81, ys, 8.3, 50, 50, 'm', 'grados'))
-print('yn ,',yn(0.013, 74.3, 0.001, ys, 8.3, 50, 50, 'm', 'grados'))
+print('yc ,',yc(74.3, 9.81, 8.3, 50, 50, 'm', 'grados'))
+print('yn ,',yn(0.013, 74.3, 0.001,  8.3, 50, 50, 'm', 'grados'))
 
 yin = 2
 print('yin ,',yin)
 
-tipoZona(yin, 0.013, 74.3, 0.001, 9.81, ys, 8.3, 50, 50, 'm', 'grados')
+tipoZona(yin, 0.013, 74.3, 0.001, 9.81, 8.3, 50, 50, 'm', 'grados')
 
 
 

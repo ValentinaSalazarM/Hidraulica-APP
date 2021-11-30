@@ -10,7 +10,7 @@ import numpy as np
 import sympy as sp
 from sympy import *
 
-Sct = symbols('Sct')
+
 
 ## Funciones para el desarrollo 
 
@@ -295,8 +295,21 @@ def Fr (d, Ryd, So, ks, vi, g,unid,uniks,uniS):
     
     return F, FT
 
-def pendiente_critica_manning(Sct, d, n, g, Ryd, unid):
+def pendiente_critica_manning(d, n, g, Ryd, unid):
     
+    """ Calcula la pendiente crítica con en n de manning\n
+        
+    Parámetros:
+        d (float) diametro.
+        n (float) n de Manning    
+        g (float) aceleración gravitacional, usualmente 9.81
+        Ryd (float) Porcentaje de la relación y/d. 
+        unid Unidades del diametro de la tubería (mm,cm,m,in)
+    Retorna:
+        float: pendiente crítica
+    """
+    
+    Sct = symbols('Sct')
     
     d = cambio_unidades(unid,d)
     
@@ -328,7 +341,7 @@ def comprobacion_manning(d,Ryd,So,g,n,unid,uniS):
     
     So = cambio_angulo(uniS,So)
     d = cambio_unidades(unid,d)
-    Sc = pendiente_critica_manning(Sct, d, n, g, Ryd, unid)
+    Sc = pendiente_critica_manning(d, n, g, Ryd, unid)
     
     
     R = Ra(d, Ryd, unid)
@@ -390,7 +403,6 @@ unid='m'
 uniks='m'
 uniS='m'
 
-print(pendiente_critica_manning(Sct, d, n, g, Ryd, unid))
 print(comprobacion_manning(d,Ryd,So,g,n,unid,uniS))
 print (valores_Darcy(d, Ryd, So, ks, vi, g,unid,uniks,uniS))
 
