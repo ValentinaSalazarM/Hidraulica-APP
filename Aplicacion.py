@@ -1338,7 +1338,8 @@ def pasoEstandar(Q,n1,n2,So1,So2,b1,b2,m11,m12,m21,m22,y_control,L1,L2,pasos1,pa
     ux2 = unidades x inicial tramo 2
     secciones = numero de secciones"""
     
-    
+    ux1 = 'm'
+    ux2 = 'm'
     
     if secciones==1:
         plot_pasos, plot_yi, plot_A, plot_P, plot_R, plot_v, plot_E, plot_z, plot_H21, plot_Sfi, plot_Sfm, plot_H22,plot_deltaH, plot_x, plot_y, plot_yc, plot_yn=pasoEstandar1(Q,n1,So1,b1,m11,m12,y_control,0,L1,pasos1,0,datum,direccion,uQ,ub1,um,uy,uSo1,uL1,ux1,0,0,0,0,0)
