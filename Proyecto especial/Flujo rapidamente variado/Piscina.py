@@ -125,7 +125,7 @@ def Caudal_base(Q,b,unib,uniQ):
     
     return q
 
-def y1(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
+def y1(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib):
     
     """ Calcula la altura al final de la caída\n
     Parámetros:
@@ -134,12 +134,11 @@ def y1(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
         Q (float) Caudal.
         b (float) base del canal
         g (float) aceleración gravitacional, usualmente 9.81      
-        S (float) inclinación de la caída.
+        S (float) termino de perdidas.
         uniy unidades de la altura inicial (mm,cm,m,in)
         unidy unidades de delta y (mm,cm,m,in)
         uniQ unidades de del caudal (m3,L)
         unib unidades de la base del canal (mm,cm,m,in)
-        uniS unidades de la inclinación (grados,radianes,m)
     Retorna:
         float: altura al final de la caída.
     """
@@ -147,7 +146,6 @@ def y1(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
 
     E = Energia_Inicial(yo,delta_y,uniy,unidy)
     q = Caudal_base(Q,b,unib,uniQ)
-    S = cambio_angulo(uniS,S)   
     
     ecu = Eq(E,y+q**2/(2*g*y**2*S**2))
     
@@ -155,7 +153,7 @@ def y1(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
     return y1
 
-def yo(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
+def yo(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib):
     
     """ Calcula la altura inicial\n
     Parámetros:
@@ -164,12 +162,12 @@ def yo(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
         Q (float) Caudal.
         b (float) base del canal
         g (float) aceleración gravitacional, usualmente 9.81      
-        S (float) inclinación de la caída.
+        S (float) termino de perdidas.
         uniy unidades de la altura inicial (mm,cm,m,in)
         unidy unidades de delta y (mm,cm,m,in)
         uniQ unidades de del caudal (m3,L)
         unib unidades de la base del canal (mm,cm,m,in)
-        uniS unidades de la inclinación (grados,radianes,m)
+        
     Retorna:
         float: altura inicial.
     """
@@ -177,7 +175,7 @@ def yo(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
 
     E = Energia_Inicial(yo,delta_y,uniy,unidy)
     q = Caudal_base(Q,b,unib,uniQ)
-    S = cambio_angulo(uniS,S)   
+    S = cambio_angulo(S)   
     
     ecu = Eq(E,y+q**2/(2*g*y**2*S**2))
     
@@ -185,7 +183,7 @@ def yo(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     
     return yo
 
-def y2(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
+def y2(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib):
     
     """ Calcula y2\n
     Parámetros:
@@ -194,18 +192,18 @@ def y2(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
         Q (float) Caudal.
         b (float) base del canal
         g (float) aceleración gravitacional, usualmente 9.81      
-        S (float) inclinación de la caída.
+        S (float) termino de perdidas.
         uniy unidades de la altura inicial (mm,cm,m,in)
         unidy unidades de delta y (mm,cm,m,in)
         uniQ unidades de del caudal (m3,L)
         unib unidades de la base del canal (mm,cm,m,in)
-        uniS unidades de la inclinación (grados,radianes,m)
+        
     Retorna:
         float: y2.
     """
     y = symbols('y')
 
-    y1_temp = y1(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS)
+    y1_temp = y1(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib)
     q = Caudal_base(Q,b,unib,uniQ)
     
     ecu = Eq(y,(y1_temp/2)*(sqrt(1+8*(q**2/(g*y1_temp**3)))-1))
@@ -215,7 +213,7 @@ def y2(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS):
     return round(y2_temp,3)
 
 
-def delta_y_i(sigma,yn,yo,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS):
+def delta_y_i(sigma,yn,yo,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib):
     
     """ Calcula delta y en cada iteración\n
     Parámetros:
@@ -226,13 +224,13 @@ def delta_y_i(sigma,yn,yo,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS):
         Q (float) Caudal.
         b (float) base del canal
         g (float) aceleración gravitacional, usualmente 9.81      
-        S (float) inclinación de la caída.
+        S (float) termino de perdidas.
         uniyn unidades de la altura normal (mm,cm,m,in)
         uniy unidades de la altura inicial (mm,cm,m,in)
         unidy unidades de delta y (mm,cm,m,in)
         uniQ unidades de del caudal (m3,L)
         unib unidades de la base del canal (mm,cm,m,in)
-        uniS unidades de la inclinación (grados,radianes,m)
+        
     Retorna:
         float: y2.
     """
@@ -240,13 +238,13 @@ def delta_y_i(sigma,yn,yo,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS):
 
     yn = cambio_unidades(uniyn,yn)
     
-    y2_temp = y2(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib,uniS)
+    y2_temp = y2(yo,delta_y,Q,b,g,S,uniy,unidy,uniQ,unib)
     
     delta_y_temp = sigma*y2_temp - yn
     
     return delta_y_temp
     
-def ciclo_Fr(sigma, yn, yo, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS):
+def ciclo_Fr(sigma, yn, yo, Q, b, g, S,uniyn,uniy,uniQ,unib,):
     
     """ Realiza las iteraciones necesarias para calcular el tipo de piscina\n
     Parámetros:
@@ -257,19 +255,20 @@ def ciclo_Fr(sigma, yn, yo, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS):
         Q (float) Caudal.
         b (float) base del canal
         g (float) aceleración gravitacional, usualmente 9.81      
-        S (float) inclinación de la caída.
+        S (float) termino de perdidas.
         uniyn unidades de la altura normal (mm,cm,m,in)
         uniy unidades de la altura inicial (mm,cm,m,in)
         unidy unidades de delta y (mm,cm,m,in)
         uniQ unidades de del caudal (m3,L)
         unib unidades de la base del canal (mm,cm,m,in)
-        uniS unidades de la inclinación (grados,radianes,m)
+        
     Retorna:
         list: delta y, Energia inicial, y1, y2, delta y i+1, error, velocidad, froude y tipo de piscina.
     """
     
     Q = cambio_unidades_Caudal(uniQ,Q)
     b = cambio_unidades(unib,b)
+    unidy='m'
     
     delta_y = 0
     centineta = False
@@ -277,9 +276,9 @@ def ciclo_Fr(sigma, yn, yo, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS):
     while centineta == False:
         
         E = Energia_Inicial(yo, delta_y, uniy,unidy)
-        y1_temp = y1(yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
-        y2_temp = y2(yo, delta_y,  Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
-        delta_y_i_temp = delta_y_i(sigma, yn, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS)
+        y1_temp = y1(yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib)
+        y2_temp = y2(yo, delta_y,  Q, b, g, S,uniy,unidy,uniQ,unib)
+        delta_y_i_temp = delta_y_i(sigma, yn, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib)
         er = abs(delta_y-delta_y_i_temp)
         delta_y = delta_y + er
         
@@ -310,10 +309,8 @@ def ciclo_Fr(sigma, yn, yo, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS):
     return delta_y,E,y1_temp,y2_temp,delta_y_i_temp,er,v1,round(Fr1,3),msg
 
 uniy='m'
-unidy='m'
 uniQ='m3'
 unib='m'
-uniS='m'
 uniyn='m'
 
 Q = 375
@@ -325,7 +322,7 @@ g = 9.81
 yos=21
 
 
-print(ciclo_Fr(sigma,yn,yos,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS))
+print(ciclo_Fr(sigma,yn,yos,Q,b,g,S,uniyn,uniy,uniQ,unib))
 
 
 
