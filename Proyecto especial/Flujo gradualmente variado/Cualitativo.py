@@ -273,7 +273,7 @@ def TipoSeccion(n,Q,S,g,b,m1,m2,uni,uni2):
 
 def abrir_imagen(im):
     
-    ruta ='D:/Documents/Hidraulica-APP/Proyecto especial/Flujo gradualmente variado/' + im + '.jpeg'
+    ruta ='D:/Documents/Hidraulica-APP/Proyecto especial/Flujo gradualmente variado/' + im + '.png'
     im = Image.open(ruta)
     im.show()
 
@@ -354,12 +354,12 @@ def tipoZona (yin, n, Q, S, g, b, m1, m2, uni, uni2):
 
 
 print('yc ,',yc(74.3, 9.81, 8.3, 50, 50, 'm', 'grados'))
-print('yn ,',yn(0.013, 74.3, 0.001,  8.3, 50, 50, 'm', 'grados'))
+print('yn ,',yn(0.013, 74.3, 0.01,  8.3, 50, 50, 'm', 'grados'))
 
-yin = 2
+yin = 1
 print('yin ,',yin)
 
-tipoZona(yin, 0.013, 74.3, 0.001, 9.81, 8.3, 50, 50, 'm', 'grados')
+tipoZona(yin, 0.013, 74.3, 0.01, 9.81, 8.3, 50, 50, 'm', 'grados')
 
 
 
