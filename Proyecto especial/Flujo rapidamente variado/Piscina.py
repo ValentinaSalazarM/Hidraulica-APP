@@ -87,7 +87,7 @@ def cambio_unidades_Caudal(unidad,caudal):
         
     return temp
 
-def Energia_Inicial (yo, delta_y,uniy,unidy):
+def Energia_Inicial (yo,delta_y, uniy,unidy):
     
     """ Calcula la energía inical\n
     Parámetros:
@@ -246,7 +246,7 @@ def delta_y_i(sigma,yn,yo,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS):
     
     return delta_y_temp
     
-def ciclo_Fr(sigma, yn, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS):
+def ciclo_Fr(sigma, yn, yo, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS):
     
     """ Realiza las iteraciones necesarias para calcular el tipo de piscina\n
     Parámetros:
@@ -278,7 +278,7 @@ def ciclo_Fr(sigma, yn, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS)
         
         E = Energia_Inicial(yo, delta_y, uniy,unidy)
         y1_temp = y1(yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
-        y2_temp = y2(yo, delta_y, Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
+        y2_temp = y2(yo, delta_y,  Q, b, g, S,uniy,unidy,uniQ,unib,uniS)
         delta_y_i_temp = delta_y_i(sigma, yn, yo, delta_y, Q, b, g, S,uniyn,uniy,unidy,uniQ,unib,uniS)
         er = abs(delta_y-delta_y_i_temp)
         delta_y = delta_y + er
@@ -323,9 +323,9 @@ sigma = 1.1
 yn = 3.45
 g = 9.81
 yos=21
-delta_y=0
 
-print(ciclo_Fr(sigma,yn,yos,delta_y,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS))
+
+print(ciclo_Fr(sigma,yn,yos,Q,b,g,S,uniyn,uniy,unidy,uniQ,unib,uniS))
 
 
 
