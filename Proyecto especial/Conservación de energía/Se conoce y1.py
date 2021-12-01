@@ -413,7 +413,7 @@ uniy = 'm'
 uniz1 = 'm'
 uniz2 = 'm'
 unim = ''
-ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/seconocey1.cvs'
+ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/seconocey1.csv'
 
 b=10
 y1=4.5

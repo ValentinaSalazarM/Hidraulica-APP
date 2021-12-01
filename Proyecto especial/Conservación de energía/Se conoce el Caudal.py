@@ -292,7 +292,7 @@ def y2fun(Q,v1,b,m1,m2,z1,z2,g,uniQ,unib,unim,uniz1,uniz2):
     return y 
 
 
-def y2_final_valor(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
+def y2_final_valor(b,  m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2):
     
     """ Esta función retorna la altura del agua en la sección dos\n    
     Parámetros:
@@ -431,7 +431,7 @@ def imprimir_valores(Q, v1, b, m1, m2, z1, z2, g, uniQ, unib, unim, uniz1, uniz2
     msg1 = '\nLa altura inicial del agua (y1) es: '+str(calculo_y1(Q,v1,b,m1,m2,uniQ,unib,unim))+' [m]'
     msg2 = '\nEl cuada es:'+str(round(Q_en_litros(Q,uniQ),4))+ ' [l/s]'
     msg3 = '\nLos valores de y2 son: '+ str(y)
-    msg4 = '\nEl valor final de y2 es: '+ str(y2_final_valor(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
+    msg4 = '\nEl valor final de y2 es: '+ str(y2_final_valor(b, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2))
     msg5 = '\nEl valor de delta z es: '+str(round(calculo_dz(z1,z2,uniz1,uniz2),2))+' [m]'
     
     msg = msg1 + msg2 +msg3 +msg4 +msg5
@@ -458,7 +458,7 @@ def valores(Q,v1,b,m1,m2,z1,z2,g,uniQ,unib,unim,uniz1,uniz2):
     
     y_2 = y2fun(Q,v1,b,m1,m2,z1,z2,g,uniQ,unib,unim,uniz1,uniz2)
     
-    y_2_final = y2_final_valor(b, y1, m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2)
+    y_2_final = y2_final_valor(b,  m1, m2, v1, z1, z2, g, unib, uniy, unim, uniz1, uniz2)
     
     A2 = Area(b,y_2_final,m1,m2,unib,uniy,unim)
     
@@ -472,7 +472,7 @@ uniy = 'm'
 uniz1 = 'm'
 uniz2 = 'm'
 unim = ''
-ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/seconocecaudal.cvs'
+ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/seconocecaudal.csv'
 
 Q=55
 b=5

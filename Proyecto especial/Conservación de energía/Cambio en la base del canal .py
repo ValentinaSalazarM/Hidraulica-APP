@@ -560,7 +560,7 @@ unib1 = 'm'
 unib2 = 'm'
 uniy = 'm'
 unim = ''
-ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/cambioenlabasedelcanal.cvs'
+ruta = 'D:\Documents\Hidraulica-APP\Proyecto especial\Conservación de energía/cambioenlabasedelcanal.csv'
 
 y1=3.8
 b1=16
