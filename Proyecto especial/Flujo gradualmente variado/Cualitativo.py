@@ -66,9 +66,25 @@ def cambio_angulo(unidad,propiedad):
         
     return temp
 
+def cambio_caudal(unidad,propiedad):
+    
+    """ Esta realiza el cambio de unidades de caudal\n        
+    Parámetros:
+        unidad (string) Puede ser L/s o m3/s. 
+        propiedad (float) Valor del caudal.
+    Retorna:
+        float: Retorna el caudal en m3/s.
+    """
+    
+    if unidad == 'L':
+        
+        temp = propiedad/1000
+    else:
+        temp = propiedad
+        
+    return temp
 
-
-def Area(y,b,m1,m2,uni,uni2):
+def Area(y,b,m1,m2,uniy,unib,unim1,unim2):
     
     """ Esta función retorna el área transversal según la figura\n
         
@@ -77,16 +93,18 @@ def Area(y,b,m1,m2,uni,uni2):
         b (float) base del canal
         m1 (int) Pendiente del lado izquierdo o pendientre triangular del canal 
         m2 (float) Pendiente parte derecha de un trapecio
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades propiedades (mm,cm,m,in)
+        unib Unidades propiedades (mm,cm,m,in)
+        unim1 Unidades angulo (grados,radianes,m)
+        unim2 Unidades angulo (grados,radianes,m)
     Retorna:
         float: El área de la sección transversal [m^2]
     """
     
-    y = cambio_unidades(uni,y)
-    b = cambio_unidades(uni,b)
-    m1 = cambio_angulo(uni2,m1)
-    m2 = cambio_angulo(uni2,m2)
+    y = cambio_unidades(uniy,y)
+    b = cambio_unidades(unib,b)
+    m1 = cambio_angulo(unim1,m1)
+    m2 = cambio_angulo(unim2,m2)
     
     if m1 == 0 and m2 == 0:
         
@@ -109,7 +127,8 @@ def Area(y,b,m1,m2,uni,uni2):
     return A
 
 
-def Perimetro(y,b,m1,m2,uni,uni2):
+
+def Perimetro(y,b,m1,m2,uniy,unib,unim1,unim2):
     """ Esta función retorna el perimetro de la sección transversal\n
         
     Parámetros:
@@ -117,15 +136,17 @@ def Perimetro(y,b,m1,m2,uni,uni2):
         b (float) base del canal
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades propiedades (mm,cm,m,in)
+        unib Unidades propiedades (mm,cm,m,in)
+        unim1 Unidades angulo (grados,radianes,m)
+        unim2 Unidades angulo (grados,radianes,m)
     Retorna:
         float: El espejo de agua de la sección transversal [m]
     """
-    y = cambio_unidades(uni,y)
-    b = cambio_unidades(uni,b)
-    m1 = cambio_angulo(uni2,m1)
-    m2 = cambio_angulo(uni2,m2)
+    y = cambio_unidades(uniy,y)
+    b = cambio_unidades(unib,b)
+    m1 = cambio_angulo(unim1,m1)
+    m2 = cambio_angulo(unim2,m2)
 
     if m1 == 0 and m2 == 0:
         
@@ -133,22 +154,22 @@ def Perimetro(y,b,m1,m2,uni,uni2):
 
     elif b==0:
         
-        P = 2*y*sqrt(1+m1**2)
+        P = 2*y*(1+m1**2)**(1/2)
         
     elif b!= 0 and m1 != 0 and m2 != 0:
         
         if m1 == m2:
                 
-            P = b + 2*y*sqrt(1+m1**2)
+            P = b + 2*y*(1+m1**2)**(1/2)
                 
         else:
                 
-            P = b + y*sqrt(1+m1**2)+y*sqrt(1+m2**2)
+            P = b + y*(1+m1**2)**(1/2)+y*(1+m2**2)**(1/2)
     
     return P
 
 
-def T(y,b,m1,m2,uni,uni2):
+def T(y,b,m1,m2,uniy,unib,unim1,unim2):
     
     """ Esta función retorna el espejo de agua según la sección transversal\n
         
@@ -157,16 +178,18 @@ def T(y,b,m1,m2,uni,uni2):
         b (float) base del canal
         m1 (float) grados o inclinación parte izquierda de un trapecio
         m2 (float) grados o inclinación parte derecha de un trapecio
-        uni Unidades propiedades (mm,cm,m,in)
-        uni2 Unidades angulo (grados,radianes,m)
+        uniy Unidades propiedades (mm,cm,m,in)
+        unib Unidades propiedades (mm,cm,m,in)
+        unim1 Unidades angulo (grados,radianes,m)
+        unim2 Unidades angulo (grados,radianes,m)
     Retorna:
         float: El espejo de agua de la sección transversal [m]
     """
 
-    y = cambio_unidades(uni,y)
-    b = cambio_unidades(uni,b)
-    m1 = cambio_angulo(uni2,m1)
-    m2 = cambio_angulo(uni2,m2)
+    y = cambio_unidades(uniy,y)
+    b = cambio_unidades(unib,b)
+    m1 = cambio_angulo(unim1,m1)
+    m2 = cambio_angulo(unim2,m2)
 
     if m1 == 0 and m2 == 0:
         
@@ -189,15 +212,30 @@ def T(y,b,m1,m2,uni,uni2):
 
     return T
 
-def yc(Q,g,b,m1,m2,uni,uni2):
+def yc(Q,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ):
+    
+    """ Esta función retorna la altura crítica \n
+        
+    Parámetros:
+        Q (float) caudal
+        g (float) velocidad gravitacional
+        b (float) base del canal
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        uniy Unidades propiedades (mm,cm,m,in)
+        unib Unidades propiedades (mm,cm,m,in)
+        unim1 Unidades angulo (grados,radianes,m)
+        unim2 Unidades angulo (grados,radianes,m)
+        uniQ Unidades del caudal (m3/s, L/s)
+    Retorna:
+        float: El espejo de agua de la sección transversal [m]
+    """
     
     ys= symbols('ys')
     
-    centinela = False
+    Q = cambio_caudal(uniQ, Q)
     
-    i = 0
-    
-    ecu = Eq(1, Q**2*T(ys,b,m1,m2,uni,uni2)/(Area(ys, b, m1, m2, uni, uni2)**3*g))
+    ecu = Eq(1, Q**2*T(ys,b,m1,m2,uniy,unib,unim1,unim2)/(Area(ys, b, m1, m2, uniy, unib,unim1,unim2)**3*g))
     
     yc = solve(ecu)
     
@@ -212,15 +250,39 @@ def yc(Q,g,b,m1,m2,uni,uni2):
     return yc
     
 
-def yn (n,Q,S,b,m1,m2,uni,uni2):
+def yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS):
     
+    """ Esta función retorna la altura normal \n
+        
+    Parámetros:
+        n (float) n de Manning
+        Q (float) caudal
+        S (float) pendiente del canal
+        b (float) base del canal
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        uniy Unidades propiedades (mm,cm,m,in)
+        unib Unidades propiedades (mm,cm,m,in)
+        unim1 Unidades angulo (grados,radianes,m)
+        unim2 Unidades angulo (grados,radianes,m)
+        uniQ Unidades del caudal (m3/s, L/s)
+        uniS Unidades angulo (grados,radianes,m)
+    Retorna:
+        float: El espejo de agua de la sección transversal [m]
+    """
     ys= symbols('ys')
+    Q = cambio_caudal(uniQ, Q)
+    S = cambio_angulo(uniS,S)
     
-    temp = n*Q/sqrt(S)
+    temp = n*Q/S**(1/2)
+
+    A = Area(ys, b, m1, m2, uniy, unib, unim1, unim2)
+    P = Perimetro(ys, b, m1, m2, uniy, unib, unim1, unim2)
+
     
+    temp2 = Eq(temp, A**(5/3)/P**(2/3))
     
-    temp2 = Eq(temp, Area(ys,b,m1,m2,uni,uni2)**(5/3)/Perimetro(ys,b,m1,m2,uni,uni2)**(2/3))
-    
+
     if S == 0:
         
         yn = 'Infinito'
@@ -237,14 +299,34 @@ def yn (n,Q,S,b,m1,m2,uni,uni2):
             
         else:
        
-            yn = solve(temp2)[0]
-                   
+            yn = float(solve(temp2)[0])
+
     return yn
 
-def TipoSeccion(n,Q,S,g,b,m1,m2,uni,uni2):
+def TipoSeccion(n,Q,S,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS):
     
-    yc1 = yc(Q,g,b,m1,m2,uni,uni2)
-    yn1 = yn (n,Q,S,b,m1,m2,uni,uni2)
+    """ Esta función retorna la altura normal \n
+        
+    Parámetros:
+        n (float) n de Manning
+        Q (float) caudal
+        S (float) pendiente del canal
+        g (float) velocidad gravitacional
+        b (float) base del canal
+        m1 (float) grados o inclinación parte izquierda de un trapecio
+        m2 (float) grados o inclinación parte derecha de un trapecio
+        uniy Unidades propiedades (mm,cm,m,in)
+        unib Unidades propiedades (mm,cm,m,in)
+        unim1 Unidades angulo (grados,radianes,m)
+        unim2 Unidades angulo (grados,radianes,m)
+        uniQ Unidades del caudal (m3/s, L/s)
+        uniS Unidades angulo (grados,radianes,m)
+    Retorna:
+        float: El espejo de agua de la sección transversal [m]
+    """
+    S = cambio_angulo(uniS,S)
+    yc1 = yc(Q,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ)
+    yn1 = yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS)
     
     if S == 0:
     
@@ -273,16 +355,16 @@ def TipoSeccion(n,Q,S,g,b,m1,m2,uni,uni2):
 
 def abrir_imagen(im):
     
-    ruta ='D:/Documents/Hidraulica-APP/Proyecto especial/Flujo gradualmente variado/' + im + '.png'
+    ruta ='.|' + im + '.png'
     im = Image.open(ruta)
     im.show()
 
-def tipoZona (yin, n, Q, S, g, b, m1, m2, uni, uni2):
+def tipoZona (yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS):
     
     
-    yc1 = yc(Q,g,b,m1,m2,uni,uni2)
-    yn1 = yn (n,Q,S,b,m1,m2,uni,uni2)    
-    msg = TipoSeccion(n, Q, S, g, b, m1, m2, uni, uni2)
+    yc1 = yc(Q,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ)
+    yn1 = yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS)
+    msg = TipoSeccion(n,Q,S,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS)
         
     
     if msg == 'Suave':
@@ -351,15 +433,32 @@ def tipoZona (yin, n, Q, S, g, b, m1, m2, uni, uni2):
             
     return msg
 
-
-
-print('yc ,',yc(74.3, 9.81, 8.3, 50, 50, 'm', 'grados'))
-print('yn ,',yn(0.013, 74.3, 0.01,  8.3, 50, 50, 'm', 'grados'))
+def valores (yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS):
+    
+    yc1 = yc(Q,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ)
+    yn1 = yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS)   
+    
+    print(yc1,yn1)
+    
+    return yc1, yn1, tipoZona(yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS)
 
 yin = 1
 print('yin ,',yin)
+n = 0.013
+Q = 74.3
+S = 0.01
+g = 9.81
+b = 8.3
+m1 = 50
+m2 = 50
+unib = 'm'
+uniy = 'm'
+unim1 = 'm'
+unim2 = 'm'
+uniQ = 'm'
+uniS = 'm'
 
-tipoZona(yin, 0.013, 74.3, 0.01, 9.81, 8.3, 50, 50, 'm', 'grados')
+print(valores(yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS))
 
 
 
