@@ -433,14 +433,44 @@ def tipoZona (yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS):
             
     return msg
 
+def pendiente_critica(n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ):
+    
+    """ Calcula la pendiente crítica con en n de manning\n
+        
+    Parámetros:
+        d (float) diametro.
+        n (float) n de Manning    
+        g (float) aceleración gravitacional, usualmente 9.81
+        Ryd (float) Porcentaje de la relación y/d. 
+        unid Unidades del diametro de la tubería (mm,cm,m,in)
+    Retorna:
+        float: pendiente crítica
+    """
+    
+    Sct = symbols('Sct')
+    
+    yc1 = yc(Q,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ)
+    temp = n*Q/Sct**(1/2)
+
+    A = Area(yc1, b, m1, m2, uniy, unib, unim1, unim2)
+    P = Perimetro(yc1, b, m1, m2, uniy, unib, unim1, unim2)
+
+    
+    temp2 = Eq(temp, A**(5/3)/P**(2/3))
+    
+    Sc = solve(temp2)
+    
+    return Sc
+
 def valores (yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS):
     
     yc1 = yc(Q,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ)
-    yn1 = yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS)   
+    yn1 = yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS) 
+    Sc = pendiente_critica(n, Q, S, g, b, m1, m2, unib, uniy, unim1, unim2, uniQ)
     
     print(yc1,yn1)
     
-    return yc1, yn1, tipoZona(yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS)
+    return yc1, yn1, Sc, tipoZona(yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS)
 
 yin = 1
 print('yin ,',yin)
@@ -457,7 +487,7 @@ unim1 = 'm'
 unim2 = 'm'
 uniQ = 'm'
 uniS = 'm'
-
+print(pendiente_critica(n, Q, S, g, b, m1, m2, unib, uniy, unim1, unim2, uniQ))
 print(valores(yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS))
 
 
