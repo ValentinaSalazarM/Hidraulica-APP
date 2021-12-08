@@ -4,7 +4,6 @@ Created on Wed Nov 10 22:57:20 2021
 
 @author: JFGJ
 """
-from PIL import Image
 import numpy as np
 import sympy as sp
 from sympy import *
@@ -58,11 +57,8 @@ def cambio_angulo(unidad,propiedad):
         
         temp = 1/np.tan(propiedad)
     
-    elif unidad == 'm':
-    
-       temp = propiedad
     else:
-        temp = 'Error'
+       temp = propiedad
         
     return temp
 
@@ -353,85 +349,77 @@ def TipoSeccion(n,Q,S,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS):
     return msg
 
 
-def abrir_imagen(im):
-    
-    ruta ='.|' + im + '.png'
-    im = Image.open(ruta)
-    im.show()
-
 def tipoZona (yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS):
     
     
     yc1 = yc(Q,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ)
     yn1 = yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS)
     msg = TipoSeccion(n,Q,S,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS)
-        
+    nombre_imagen = ''
     
     if msg == 'Suave':
     
         if yin > yn1:
             
-            abrir_imagen('M1')
+            nombre_imagen = 'M1'
             
         elif yin < yn1 and yin > yc1:
         
-            abrir_imagen('M2')
+            nombre_imagen = 'M2'
         
         elif yin < yc1:
         
-            abrir_imagen('M3')
+            nombre_imagen = 'M3'
             
     elif msg == 'Empinada':
             
         if yin > yc1:
             
-            abrir_imagen('S1')
+            nombre_imagen = 'S1'
             
         elif yin < yc1 and yin > yn1:
         
-            abrir_imagen('S2')
+            nombre_imagen = 'S2'
         
         elif yin < yn1:
-        
-            abrir_imagen('S3')
+            nombre_imagen = 'S3'
 
     elif msg == 'Critica':
 
         if yin > yn1:
             
-            abrir_imagen('C1')
+            nombre_imagen = 'C1'
             
         elif yin == yn1:
         
-            abrir_imagen('C2')
+            nombre_imagen = 'C2'
         
         elif yin < yn1:
-        
-            abrir_imagen('C3')
+            
+            nombre_imagen = 'C3'
     
     elif msg == 'Horizontal':
     
-        
         if yin > yc1:
         
-            abrir_imagen('H2')
+            nombre_imagen = 'H2'
         
         elif yin < yc1:
         
-            abrir_imagen('H3')  
+            nombre_imagen = 'H3'  
 
     if msg == 'Adversa':
 
                    
         if yin > yc1:
-        
-            abrir_imagen('A2')
+            
+            nombre_imagen = 'A2'
         
         elif yin < yc1:
         
-            abrir_imagen('A3')
+            nombre_imagen = 'A3'
             
-    return msg
+    return msg, nombre_imagen
 
 def pendiente_critica(n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ):
     
@@ -467,9 +455,7 @@ def valores (yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS):
     yc1 = yc(Q,g,b,m1,m2,unib,uniy,unim1,unim2,uniQ)
     yn1 = yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS) 
     Sc = pendiente_critica(n, Q, S, g, b, m1, m2, unib, uniy, unim1, unim2, uniQ)
-    
-    print(yc1,yn1)
-    
+        
     return yc1, yn1, Sc, tipoZona(yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS)
 
 yin = 1
