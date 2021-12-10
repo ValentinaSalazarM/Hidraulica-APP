@@ -49,7 +49,11 @@ def cambio_angulo(unidad,propiedad):
         float: Retorna el angulo en pendiente (m).
     """
     
-    if unidad == 'grados':
+    if propiedad ==0:
+          
+        temp = propiedad
+    
+    elif unidad == 'grados':
         
         temp = 1/np.tan((np.pi/180)*propiedad)
     
@@ -101,10 +105,10 @@ def Area(y,b,m1,m2,uniy,unib,unim1,unim2):
         float: El área de la sección transversal [m^2]
     """
     
-    y = cambio_unidades(uniy,y)
     b = cambio_unidades(unib,b)
     m1 = cambio_angulo(unim1,m1)
     m2 = cambio_angulo(unim2,m2)
+    
     
     if m1 == 0 and m2 == 0:
         
@@ -273,15 +277,17 @@ def yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS):
     ys= symbols('ys')
     Q = cambio_caudal(uniQ, Q)
     S = cambio_angulo(uniS,S)
-    
+    m1 = cambio_angulo(unim1,m1)
+    m2 = cambio_angulo(unim2,m2)
+    '''
     temp = n*Q/S**(1/2)
-
+    
     A = Area(ys, b, m1, m2, uniy, unib, unim1, unim2)
     P = Perimetro(ys, b, m1, m2, uniy, unib, unim1, unim2)
 
     
     temp2 = Eq(temp, A**(5/3)/P**(2/3))
-    
+'''    
 
     if S == 0:
         
@@ -293,13 +299,30 @@ def yn (n,Q,S,b,m1,m2,unib,uniy,unim1,unim2,uniQ,uniS):
         
     else:
         
-        if b!= 0 and m1 != 0 and m2 != 0:
+        if m1 == 0 and m2 ==0:
             
-            yn = float(solve(temp2)[0])
+            ecu = Eq((n*Q)**3*(b+2*ys)**2,S**(3/2)*(b*ys)**5)
             
-        else:
+            yn = solve(ecu)[0]
+        elif b ==0:
+            
+            ecu = Eq((n*Q)**3*(2*ys*(1+m1**2)**(1/2))**2,S**(3/2)*(ys**2*m1)**5)
+            
+            yn = solve(ecu)[2]
+            
+        elif b!= 0 and m1 != 0 and m2 != 0:
+            
+            if m1 == m2:
+            
+                ecu = Eq(((n*Q)**3)*(b+2*ys*(1+m1**2)**(1/2))**2,S**(3/2)*(ys*(b+m1*ys))**5)
+                
+                yn = solve(ecu)[1]
+                
+            else:
+                
+                ecu = Eq((n*Q)**3*(b+ys*(1+m1**2)**(1/2)+ys*(1+m2**2)**(1/2))**2,S**(3/2)*(m1*ys**2/2+b*ys+m2*ys**2/2)**5)
        
-            yn = float(solve(temp2)[0])
+                yn = solve(ecu)[1]
 
     return yn
 
@@ -476,17 +499,18 @@ yin = 1
 print('yin ,',yin)
 n = 0.013
 Q = 74.3
-S = 0.01
+S = 0.001
 g = 9.81
 b = 8.3
 m1 = 50
 m2 = 50
 unib = 'm'
 uniy = 'm'
-unim1 = 'm'
-unim2 = 'm'
+unim1 = 'grados'
+unim2 = 'grados'
 uniQ = 'm'
 uniS = 'm'
+print(Area(yc(Q, g, b, m1, m2, unib, uniy, unim1, unim2, uniQ), b, m1, m2, uniy, unib, unim1, unim2))
 print(pendiente_critica(n, Q, S, g, b, m1, m2, unib, uniy, unim1, unim2, uniQ))
 print(valores(yin, n, Q, S, g, b, m1, m2, unib, uniy, unim1,unim2,uniQ,uniS))
 
